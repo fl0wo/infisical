@@ -4,6 +4,8 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as yup from "yup";
 
+import CreateConsumerCreditCard from "@app/components/consumer-secrets/CreateConsumerCreditCard";
+import CreateConsumerSecureNote from "@app/components/consumer-secrets/CreateConsumerSecureNote";
 import {
     consumerSecretWebsiteLogin,
     CreateConsumerWebsiteLogin
@@ -21,6 +23,7 @@ import {usePopUp} from "@app/hooks";
 
 const sleep = (ms: number) => new Promise((resolve) => {setTimeout(resolve, ms)});
 
+// FIXME: is this the right place for this bad boy?
 const consumerSecretTypes = [
     {
         name: "Website Login",
@@ -53,6 +56,8 @@ const consumerSecretFormSchema = yup.object({
         switch (value.type) {
             case "website_login":
                 return consumerSecretWebsiteLogin;
+
+            // TODO: implement those as well
             // case "credit_card":
             //     return creditCardSchema;
             // case "secure_note":
@@ -71,7 +76,7 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
-        const [selectedConsumerSecretType, setSelectedConsumerSecretType] = useState<string | undefined>();
+        const [selectedConsumerSecretType, setSelectedConsumerSecretType] = useState<TCreateConsumerSecretFormData["type"] | undefined>();
 
         const onCreateConsumerSecret = async (consumerSecretData: TCreateConsumerSecretFormData) => {
             try {
@@ -217,6 +222,18 @@ const UserSecrets = withPermission(() => {
                                         onSubmit={onCreateConsumerSecret}
                                         renderActions={renderFormsActions}
                                     />
+                                )
+                            }
+
+                            {
+                                selectedConsumerSecretType === "credit_card" && (
+                                    <CreateConsumerCreditCard/>
+                                )
+                            }
+
+                            {
+                                selectedConsumerSecretType === "secure_note" && (
+                                    <CreateConsumerSecureNote/>
                                 )
                             }
 
