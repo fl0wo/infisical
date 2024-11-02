@@ -112,6 +112,8 @@ export const permissionServiceFactory = ({
     authMethod: ActorAuthMethod,
     userOrgId?: string
   ) => {
+    // TODO: (flo) this method for admin returns not the "user-secrets" permission, understand why
+
     // when token is scoped, ensure the passed org id is same as user org id
     if (userOrgId && userOrgId !== orgId)
       throw new ForbiddenRequestError({ message: "Invalid user token. Scoped to different organization." });

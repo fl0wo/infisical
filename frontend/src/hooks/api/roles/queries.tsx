@@ -110,6 +110,7 @@ export const useGetOrgRole = (orgId: string, roleId: string) =>
 const getUserOrgPermissions = async ({ orgId }: TGetUserOrgPermissionsDTO) => {
   if (orgId === "") return { permissions: [], membership: null };
 
+  // TODO: (flo) understand how to let admin user get "user-secrets" permission as well
   const { data } = await apiRequest.get<{
     permissions: PackRule<RawRuleOf<MongoAbility<OrgPermissionSet>>>[];
     membership: OrgUser;

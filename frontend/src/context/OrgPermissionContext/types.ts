@@ -1,32 +1,33 @@
-import { MongoAbility } from "@casl/ability";
+import {MongoAbility} from "@casl/ability";
 
 export enum OrgPermissionActions {
-  Read = "read",
-  Create = "create",
-  Edit = "edit",
-  Delete = "delete"
+    Read = "read",
+    Create = "create",
+    Edit = "edit",
+    Delete = "delete"
 }
 
 export enum OrgPermissionSubjects {
-  Workspace = "workspace",
-  Role = "role",
-  Member = "member",
-  Settings = "settings",
-  IncidentAccount = "incident-contact",
-  Scim = "scim",
-  Sso = "sso",
-  Ldap = "ldap",
-  Groups = "groups",
-  Billing = "billing",
-  SecretScanning = "secret-scanning",
-  Identity = "identity",
-  Kms = "kms",
-  AdminConsole = "organization-admin-console",
-  AuditLogs = "audit-logs"
+    Workspace = "workspace",
+    Role = "role",
+    Member = "member",
+    Settings = "settings",
+    IncidentAccount = "incident-contact",
+    Scim = "scim",
+    Sso = "sso",
+    Ldap = "ldap",
+    Groups = "groups",
+    Billing = "billing",
+    SecretScanning = "secret-scanning",
+    UserSecrets = "user-secrets",
+    Identity = "identity",
+    Kms = "kms",
+    AdminConsole = "organization-admin-console",
+    AuditLogs = "audit-logs"
 }
 
 export enum OrgPermissionAdminConsoleAction {
-  AccessAllProjects = "access-all-projects"
+    AccessAllProjects = "access-all-projects"
 }
 
 export type OrgPermissionSet =
@@ -41,6 +42,7 @@ export type OrgPermissionSet =
   | [OrgPermissionActions, OrgPermissionSubjects.Ldap]
   | [OrgPermissionActions, OrgPermissionSubjects.Groups]
   | [OrgPermissionActions, OrgPermissionSubjects.SecretScanning]
+  | [OrgPermissionActions, OrgPermissionSubjects.UserSecrets]
   | [OrgPermissionActions, OrgPermissionSubjects.Billing]
   | [OrgPermissionActions, OrgPermissionSubjects.Identity]
   | [OrgPermissionActions, OrgPermissionSubjects.Kms]
