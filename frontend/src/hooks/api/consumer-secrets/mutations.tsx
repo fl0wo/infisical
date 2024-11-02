@@ -4,19 +4,12 @@ import {apiRequest} from "@app/config/request";
 import {consumerSecretKeys} from "@app/hooks/api/consumer-secrets/queries";
 import {TConsumerSecret, TCreateConsumerSecretRequest} from "@app/hooks/api/consumer-secrets/types";
 
-/*
-Create REST endpoints to handle the following operations:
-Create: Add a new set of credentials.
-Read: Retrieve the list of saved credentials.
-Update: Modify existing credentials.
-Delete: Remove credentials.
- */
 
 export const useCreateOrganizationConsumerSecret = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({organizationId, name, content}: {
+        mutationFn: async ({organizationId, name, note, content}: {
             organizationId: string;
             name: string;
             note?: string;
@@ -24,11 +17,12 @@ export const useCreateOrganizationConsumerSecret = () => {
         }) => {
             const {data} = await apiRequest.post(`/api/v1/organization/${organizationId}/consumer-secrets`, {
                 name,
+                note,
                 content
             });
             return data;
         },
-        onSuccess: (_, { organizationId }) => {
+        onSuccess: (_, {organizationId}) => {
             queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
         }
     });
@@ -40,15 +34,17 @@ export const useUpdateOrganizationConsumerSecret = () => {
                                organizationId,
                                id,
                                name,
+                               note,
                                content
                            }: TCreateConsumerSecretRequest) => {
             const {data} = await apiRequest.patch(`/api/v1/organization/${organizationId}/consumer-secrets/${id}`, {
                 name,
+                note,
                 content
             });
             return data;
         },
-        onSuccess: (_, { organizationId }) => {
+        onSuccess: (_, {organizationId}) => {
             queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
         }
     });
@@ -68,7 +64,7 @@ export const useDeleteOrganizationConsumerSecret = () => {
             const {data} = await apiRequest.delete(`/api/v1/organization/${organizationId}/consumer-secrets/${id}`);
             return data;
         },
-        onSuccess: (_, { organizationId }) => {
+        onSuccess: (_, {organizationId}) => {
             queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
         }
     });
