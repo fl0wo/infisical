@@ -8,7 +8,7 @@ import CreateConsumerCreditCard from "@app/components/consumer-secrets/CreateCon
 import CreateConsumerSecureNote from "@app/components/consumer-secrets/CreateConsumerSecureNote";
 import {
     consumerSecretWebsiteLogin,
-    CreateConsumerWebsiteLogin
+    CreateConsumerWebsiteLogin,
 } from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
 import {createNotification} from "@app/components/notifications";
 import {OrgPermissionCan} from "@app/components/permissions";
@@ -20,10 +20,8 @@ import {
 import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
 import {usePopUp} from "@app/hooks";
+import {useCreateOrganizationConsumerSecret} from "@app/hooks/api/consumer-secrets";
 
-const sleep = (ms: number) => new Promise((resolve) => {setTimeout(resolve, ms)});
-
-// FIXME: is this the right place for this bad boy?
 const consumerSecretTypes = [
     {
         name: "Website Login",
@@ -40,7 +38,7 @@ const consumerSecretTypes = [
 ];
 
 // dynamically adapts to the type of consumer secret being created
-const consumerSecretFormSchema = yup.object({
+export const consumerSecretFormSchema = yup.object({
     type: yup
         .string()
         .oneOf(
@@ -56,7 +54,6 @@ const consumerSecretFormSchema = yup.object({
         switch (value.type) {
             case "website_login":
                 return consumerSecretWebsiteLogin;
-
             // TODO: implement those as well
             // case "credit_card":
             //     return creditCardSchema;
@@ -68,7 +65,7 @@ const consumerSecretFormSchema = yup.object({
     })
 });
 
-type TCreateConsumerSecretFormData = yup.InferType<typeof consumerSecretFormSchema>;
+export type TCreateConsumerSecretFormData = yup.InferType<typeof consumerSecretFormSchema>;
 
 const UserSecrets = withPermission(() => {
 
@@ -76,13 +73,16 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
+        const mutate = useCreateOrganizationConsumerSecret();
+
         const [selectedConsumerSecretType, setSelectedConsumerSecretType] = useState<TCreateConsumerSecretFormData["type"] | undefined>();
 
-        const onCreateConsumerSecret = async (consumerSecretData: TCreateConsumerSecretFormData) => {
+        const onCreateConsumerSecret = async (
+            data: TCreateConsumerSecretFormData["data"]
+        ) => {
             try {
 
-                // type of consumerSecretData should be smth like {type} & WebsiteLogin | CreditCard | SecureNote but seems yup.InferType is not working on my IDE maybe on VSCode it shows the correct type
-                console.log("Creating secret...", consumerSecretData);
+                console.log("Creating secret...", data);
 
                 // The secret will be added regardless of it's content, the content will be saved as a JSON stringlyfied object
                 // The secret will be encrypted and saved in the database
@@ -103,10 +103,16 @@ const UserSecrets = withPermission(() => {
                 // 5. No db constraints, just application constraints
 
                 // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
+                await mutate.mutateAsync({
+                    organizationId: "organizationId",
+                    name: "name",
+                    note: "",
 
-                await sleep(3_000); // mutate here
+                    // FIXME: type of data should be smth like {type} & WebsiteLogin | CreditCard | SecureNote but seems yup.InferType is not working on my IDE maybe on VSCode it shows the correct type
+                    content: data,
+                });
 
-                console.log("Created secret!", consumerSecretData);
+                console.log("Created secret!", data);
 
                 createNotification({text: "Ciao!", type: "success"});
                 handlePopUpClose("addNewConsumerSecret");
