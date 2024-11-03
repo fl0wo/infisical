@@ -278,10 +278,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       const paramConsumerSecretId = req.params.id;
       const consumerSecret = await server.services.consumerSecret.getSecretById(paramConsumerSecretId);
 
-      // 2. check if user belongs to the organization in which the secret is
       const orgId = consumerSecret.organizationId;
-
-      console.log("DELETING?", consumerSecret.id);
 
       if (!orgId) {
         throw new Error("Organization ID not found");
@@ -296,9 +293,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
         orgId
       );
 
-      const deletedSecret = await server.services.consumerSecret.deleteSecretById(consumerSecret.id);
-
-      return deletedSecret;
+      return server.services.consumerSecret.deleteSecretById(consumerSecret.id);
     }
   });
 };

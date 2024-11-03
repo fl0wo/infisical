@@ -40,8 +40,6 @@ const UserSecrets = withPermission(() => {
             data: TCreateConsumerSecretFormData["data"]
         ) => {
 
-            console.log("Arrived", data);
-
             try {
 
                 if (!currentOrgId) {

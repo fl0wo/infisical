@@ -4,10 +4,10 @@ import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 
 import {
-    consumerSecretWebsiteLogin,
+    creditCardSchema,
     TCreateConsumerSecretCreditCardFormData,
 } from "@app/components/utilities/consumer-secrets/types";
-import {FormControl, Input} from "@app/components/v2";
+import {FormControl, Input, TextArea} from "@app/components/v2";
 
 import "react-credit-cards-2/dist/es/styles-compiled.css";
 
@@ -40,7 +40,7 @@ export default function CreateConsumerCreditCard({
         reset,
         handleSubmit
     } = useForm<TCreateConsumerSecretCreditCardFormData>({
-        resolver: yupResolver(consumerSecretWebsiteLogin),
+        resolver: yupResolver(creditCardSchema),
         defaultValues: {
             type: "credit_card", // do I really need to keep this? or line 8 is enough?
             ...currentSecret
@@ -91,7 +91,7 @@ export default function CreateConsumerCreditCard({
                                 {...field}
                                 placeholder="Type your card number"
                                 type="number"
-                                value={state.number}
+                                value={field.value}
                                 onChange={(val) => {
                                     if (val.target.value.length > 19) {
                                         return;
@@ -101,6 +101,7 @@ export default function CreateConsumerCreditCard({
                                         number: val.target.value,
                                         focus: "number"
                                     }));
+                                    field.onChange(val);
                                 }}
                                 maxLength={19}
                                 onFocus={() => {
@@ -129,13 +130,14 @@ export default function CreateConsumerCreditCard({
                             <Input
                                 {...field}
                                 onChangeCapture={onFormFieldsChanged}
-                                value={state.name}
+                                value={field.value}
                                 onChange={(val) => {
                                     setState((prev) => ({
                                         ...prev,
                                         name: val.target.value,
                                         focus: "name"
                                     }));
+                                    field.onChange(val);
                                 }}
                                 onFocus={() => {
                                     setState((prev) => ({
@@ -162,7 +164,7 @@ export default function CreateConsumerCreditCard({
                             <Input
                                 {...field}
                                 onChangeCapture={onFormFieldsChanged}
-                                value={state.expiry}
+                                value={field.value}
                                 onChange={(val) => {
                                     if (val.target.value.length > 4) {
                                         return;
@@ -172,6 +174,7 @@ export default function CreateConsumerCreditCard({
                                         expiry: val.target.value,
                                         focus: "expiry"
                                     }));
+                                    field.onChange(val);
                                 }}
                                 onFocus={() => {
                                     setState((prev) => ({
@@ -196,9 +199,10 @@ export default function CreateConsumerCreditCard({
                             errorText={error?.message}
                         >
                             <Input
-                                {...field}
                                 onChangeCapture={onFormFieldsChanged}
-                                value={state.cvc}
+                                {...field}
+
+                                value={field.value}
                                 onChange={(val) => {
                                     if (val.target.value.length > 3) {
                                         return;
@@ -208,14 +212,17 @@ export default function CreateConsumerCreditCard({
                                         cvc: val.target.value,
                                         focus: "cvc"
                                     }));
+                                    field.onChange(val);
                                 }}
+
                                 onFocus={() => {
                                     setState((prev) => ({
                                         ...prev,
                                         focus: "cvc"
                                     }));
                                 }}
-                                placeholder="Type your cvv"/>
+                                placeholder="Type your cvv"
+                            />
                         </FormControl>
                     )}
                 />
@@ -231,11 +238,11 @@ export default function CreateConsumerCreditCard({
                             isError={Boolean(error)}
                             errorText={error?.message}
                         >
-                            <Input {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your notes"/>
+                            <TextArea onChangeCapture={onFormFieldsChanged}  {...field}  placeholder="Type your notes"/>
                         </FormControl>
                     )}
-                />
 
+                />
                 {renderActions(isSubmitting, reset)}
 
             </form>
