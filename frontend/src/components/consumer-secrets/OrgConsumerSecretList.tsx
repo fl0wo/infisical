@@ -30,7 +30,11 @@ export const OrgConsumerSecretList = ({
                     consumerSecrets &&
                     consumerSecrets
                         ?.map((secret) => {
-                        return (
+                            function secondsAgo(createdAt: string | undefined) {
+                                return (Date.now() - new Date(createdAt ?? Date.now()).getTime()) / 1000;
+                            }
+
+                            return (
                             <Tr
                                 onClick={() => {
                                     if(!secret.id) {
@@ -49,8 +53,7 @@ export const OrgConsumerSecretList = ({
                                         "duration-200",
                                         "border-b",
                                         "border-gray-200",
-                                        // todo: refactor, less than 10sec ago? Show as new and highlight green
-                                        Date.now() - new Date(secret.createdAt ?? Date.now()).getTime() < 10 * 1000 && "bg-primary text-black",
+                                        secondsAgo(secret.createdAt) < 10 && "bg-primary text-black",
                                     )
                                 }
                             >

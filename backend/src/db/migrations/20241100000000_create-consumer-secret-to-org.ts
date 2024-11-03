@@ -14,6 +14,7 @@ export async function up(knex: Knex): Promise<void> {
     t.binary("encryptedValue").notNullable();
     t.binary("encryptedComment").notNullable();
 
+    // this line can be safely removed and ignored it was just for a test I did
     t.text("test");
 
     t.string("type")
