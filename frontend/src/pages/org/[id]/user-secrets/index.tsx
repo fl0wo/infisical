@@ -80,8 +80,6 @@ const UserSecrets = withPermission(() => {
             isLoading: isOrgConsumerSecretsLoading,
         } = useOrganizationConsumerSecrets(currentOrgId);
 
-        console.log("Replied data", orgConsumerSecrets);
-
         const mutate = useCreateOrganizationConsumerSecret();
 
         const [selectedConsumerSecretType, setSelectedConsumerSecretType] = useState<TCreateConsumerSecretFormData["type"] | undefined>();
@@ -91,7 +89,7 @@ const UserSecrets = withPermission(() => {
         ) => {
             try {
 
-                if(!currentOrgId) {
+                if (!currentOrgId) {
                     throw new Error("Organization ID not found");
                 }
 
@@ -162,26 +160,44 @@ const UserSecrets = withPermission(() => {
                             Consumer Secrets
                         </div>
                         <div className="mb-6 text-lg text-mineshaft-300">
-                            Manage your consumer secrets here.
+                            Create and manage your consumer secrets to centralize your organization&apos;s non-technical secrets.
                         </div>
 
-                        {/* FIXME: should look for ConsumerSecret OrgPermissionSubject not Workspace */}
-                        <OrgPermissionCan I={OrgPermissionActions.Create} an={OrgPermissionSubjects.Workspace}>
-                            {(isAllowed) => (
-                                <Button
-                                    isDisabled={!isAllowed}
-                                    colorSchema="primary"
-                                    leftIcon={<FontAwesomeIcon icon={faPlus}/>}
-                                    onClick={() => {
-                                        console.log("Create new user secret");
-                                        handlePopUpOpen("addNewConsumerSecret");
-                                    }}
-                                    className="ml-2"
-                                >
-                                    Add New Consumer Secret
-                                </Button>
-                            )}
-                        </OrgPermissionCan>
+
+                        <div
+                            className="relative mb-6 flex justify-between rounded-md border border-mineshaft-600 bg-mineshaft-800 p-6">
+                            <div className="flex flex-col items-start">
+                                <div className="mb-1 flex flex-row">
+                                    User Secrets{" "}
+                                </div>
+                                <div>
+                                    <p className="text-mineshaft-300">
+                                        Create and share secrets such as website logins, credit cards, and secure notes.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex h-[3.25rem] items-center">
+                                {/* FIXME: should look for ConsumerSecret OrgPermissionSubject not Workspace */}
+                                <OrgPermissionCan I={OrgPermissionActions.Create} an={OrgPermissionSubjects.Workspace}>
+                                    {(isAllowed) => (
+                                        <Button
+                                            isDisabled={!isAllowed}
+                                            colorSchema="primary"
+                                            leftIcon={<FontAwesomeIcon icon={faPlus}/>}
+                                            onClick={() => {
+                                                console.log("Create new user secret");
+                                                handlePopUpOpen("addNewConsumerSecret");
+                                            }}
+                                            className="ml-2"
+                                        >
+                                            Add New Consumer Secret
+                                        </Button>
+                                    )}
+                                </OrgPermissionCan>
+                            </div>
+                        </div>
+
 
                         {/* list all current consumer secrets */}
 
@@ -257,7 +273,8 @@ const UserSecrets = withPermission(() => {
                     </Modal>
                 </div>
             </div>
-        );
+        )
+            ;
     },
     {
         action: OrgPermissionActions.Read,

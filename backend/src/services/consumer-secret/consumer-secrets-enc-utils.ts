@@ -3,7 +3,10 @@
 import { ConsumerSecretType } from "@app/db/schemas";
 import { TConsumerSecrets } from "@app/db/schemas/consumer-secrets";
 import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
-import { TCreateConsumerSecretDTO } from "@app/services/consumer-secret/consumer-secret-types";
+import {
+  TCreateConsumerSecretDTO,
+  TCreateConsumerSecretDTOInsert
+} from "@app/services/consumer-secret/consumer-secret-types";
 
 const tempKey = "01234567890123456789012345678901";
 
@@ -91,7 +94,7 @@ export const decryptConsumerSecretToModelDTO = (encryptedSecret: TConsumerSecret
   return x;
 };
 
-export const encryptConsumerSecretModelDTO = (body: TCreateConsumerSecretDTO) => {
+export const encryptConsumerSecretModelDTO = (body: TCreateConsumerSecretDTOInsert) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   // Is there a better way to do this?
   const stringifiedSecretValue = JSON.stringify(body.secretValue);
