@@ -31,3 +31,18 @@ export type CreditCardContent = {
 export type SecureNoteContent = {
   note: string
 }
+
+
+export type TConsumerSecretFetched = {
+    type: "website_login" | "credit_card" | "secure_note",
+    name: string,
+
+    userId?: string,
+    organizationId?: string,
+
+    createdAt?: string,
+    updatedAt?: string,
+
+    secretComment: string,
+    secretValue: WebsiteLoginContent | CreditCardContent | SecureNoteContent,
+}

@@ -13,6 +13,7 @@ export const useOrganizationConsumerSecrets = (organizationId: string) => {
       const { data } = await apiRequest.get(`/api/v3/consumer-secrets/${organizationId}`);
       return data;
     },
+    select: (data) => data.consumerSecrets,
     staleTime: 0,
   });
 };

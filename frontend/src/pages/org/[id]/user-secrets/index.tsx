@@ -10,6 +10,7 @@ import {
     consumerSecretWebsiteLogin,
     CreateConsumerWebsiteLogin,
 } from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
+import {OrgConsumerSecretList} from "@app/components/consumer-secrets/OrgConsumerSecretList";
 import {createNotification} from "@app/components/notifications";
 import {OrgPermissionCan} from "@app/components/permissions";
 import {Button, Modal, ModalContent, Select, SelectItem} from "@app/components/v2";
@@ -69,9 +70,12 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
-        const res = useOrganizationConsumerSecrets("organizationId");
+        const {
+            data: orgConsumerSecrets,
+            isLoading: isOrgConsumerSecretsLoading,
+        } = useOrganizationConsumerSecrets("organizationId");
 
-        console.log("Replied data",res?.data);
+        console.log("Replied data", orgConsumerSecrets);
 
         const mutate = useCreateOrganizationConsumerSecret();
 
@@ -104,6 +108,7 @@ const UserSecrets = withPermission(() => {
 
                 // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
                 await mutate.mutateAsync({
+                    // fixme: understand how to get the CURRENT organizationId
                     organizationId: "7cbe3e71-6cf5-4460-8a4d-9d1828330779",
                     name: data.name,
                     secretComment: data.notes,
@@ -188,6 +193,45 @@ const UserSecrets = withPermission(() => {
                         </OrgPermissionCan>
 
                         {/* list all current consumer secrets */}
+
+                        <div className="mt-6">
+                            <div className="text-lg font-semibold text-gray-200">
+                                Current Consumer Secrets
+                            </div>
+                            <div className="mt-2">
+                                {
+                                    isOrgConsumerSecretsLoading ? (
+                                        <div>Loading...</div>
+                                    ) : (
+
+                                        <OrgConsumerSecretList
+                                            isLoading={isOrgConsumerSecretsLoading}
+                                            consumerSecrets={orgConsumerSecrets}
+                                        />
+                                        // <div>
+                                        //     {
+                                        //         orgConsumerSecrets?.map((consumerSecret:TConsumerSecretFetched) => (
+                                        //             <div key={consumerSecret.name}>
+                                        //                 <div>
+                                        //                     {consumerSecret.name}
+                                        //                 </div>
+                                        //                 <div>
+                                        //                     {consumerSecret.type}
+                                        //                 </div>
+                                        //                 <div>
+                                        //                     {consumerSecret.secretComment}
+                                        //                 </div>
+                                        //                 <div>
+                                        //                     {JSON.stringify(consumerSecret.secretValue)}
+                                        //                 </div>
+                                        //             </div>
+                                        //         ))
+                                        //     }
+                                        // </div>
+                                    )
+                                }
+                            </div>
+                        </div>
 
                     </div>
 
