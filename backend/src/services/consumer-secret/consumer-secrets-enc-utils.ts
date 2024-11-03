@@ -1,5 +1,6 @@
-// TODO: we should Instead use a service dedicated to encryption and decryption and blob handling
+// TODO: we should Instead use a service dedicated to encryption and decryption and blob handling, but to go faster I just created a file like this
 // Convert base64 to buffer and back
+
 import { ConsumerSecretType } from "@app/db/schemas";
 import { TConsumerSecrets } from "@app/db/schemas/consumer-secrets";
 import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
@@ -9,6 +10,7 @@ import {
   TCreateConsumerSecretDTOUpdate
 } from "@app/services/consumer-secret/consumer-secret-types";
 
+// This is a temporary key for MVP purposes only. It should be replaced with a more secure key or with a org-binded key (therefore made dynamic the encryption)
 const tempKey = "01234567890123456789012345678901";
 
 export function base64ToBuffer(base64: string) {
@@ -102,19 +104,14 @@ export const encryptConsumerSecretModelDTO = (
     throw new Error("secretValue or secretComment is missing on encryptConsumerSecretModelDTO");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  // Is there a better way to do this?
   const stringifiedSecretValue = JSON.stringify(body.secretValue);
 
-  // FIXME: What enc key can we use? Maybe something related and unique to the Org, but hidden from the outside world mmmm
   // Could I use infisicalSymmetricEncypt and use the ROOT key? Maybe not? mmmmmmmmm
-
   const secretValueEncrypted = encryptSymmetric128BitHexKeyUTF8(stringifiedSecretValue, tempKey);
   const secretCommentEncrypted = encryptSymmetric128BitHexKeyUTF8(body.secretComment, tempKey);
   // Should I merge chiperText, iv, tag, keyEncoding, algorithm, etc. into a single stringEncryptedValue and store it in the DB as a single column?
   // I noticed that there's a service called kmsServiceFactory that has a encryptor and decryptor that merges those 3 fields into a signle blob buffer and saves it in the db as a blob column not 3 strings
   // For this MVP I'll do code duplication:
-
   // concat the buffers in an order that can be split later
   // I'm going to save those fields in the DB as "encryptedValue" and "encryptedComment" as a single column
   const encryptedValueBuffer = combineFields(secretValueEncrypted);

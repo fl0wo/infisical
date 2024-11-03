@@ -74,27 +74,22 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      const paramOrganizationId = req.params.organizationId;
-
-      const actor = req.permission.type;
-      const actorId = req.permission.id;
-      const actorOrgId = req.permission.orgId;
-      const actorAuthMethod = req.permission.authMethod;
+      const paramOrgId = req.params.organizationId;
 
       // if this does not throw, then the user has access to the organization
       await server.services.permission.getOrgPermission(
-        actor,
-        actorId,
-        actorOrgId,
-        actorAuthMethod,
-        paramOrganizationId
+        req.permission.type,
+        req.permission.id,
+        req.permission.orgId,
+        req.permission.authMethod,
+        paramOrgId
       );
 
       // TODO: enable check on the permission level
-      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.AuditLogs);
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.ConsumerSecrets);
 
       const consumerSecretsOfOrganization =
-        await server.services.consumerSecret.listAndDecryptSecretsByOrganizationId(actorOrgId);
+        await server.services.consumerSecret.listAndDecryptSecretsByOrganizationId(paramOrgId);
 
       return {
         consumerSecrets: consumerSecretsOfOrganization
@@ -130,27 +125,23 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       const paramConsumerSecretId = req.params.consumerSecretId;
       const consumerSecret = await server.services.consumerSecret.getAndDecryptSecretById(paramConsumerSecretId);
 
+      const orgId = consumerSecret.organizationId;
       // 2. check if user belongs to the organization in which the secret is
-      const paramOrganizationId = consumerSecret.organizationId;
-
-      const actor = req.permission.type;
-      const actorId = req.permission.id;
-      const actorOrgId = req.permission.orgId;
-      const actorAuthMethod = req.permission.authMethod;
-
       // if this does not throw, then the user has access to the organization
       await server.services.permission.getOrgPermission(
-        actor,
-        actorId,
-        actorOrgId,
-        actorAuthMethod,
-        paramOrganizationId
+        req.permission.type,
+        req.permission.id,
+        req.permission.orgId,
+        req.permission.authMethod,
+        orgId
       );
 
       // TODO: enable check on the permission level
-      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.AuditLogs);
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.ConsumerSecrets);
 
-      return { consumerSecret };
+      return {
+        consumerSecret
+      };
     }
   });
 
@@ -178,26 +169,28 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      // TODO: 1. understand how to get the current userId (logged session)
-      // TODO: 2. understand how to get the organizationId
-      // TODO: 3. understand how to check if the user belongs to the organization
+      const paramOrgId = req.params.organizationId;
 
-      console.log("Creating Consumer Secret request", req.url, req.body);
+      // if this does not throw, then the user has access to the organization
+      await server.services.permission.getOrgPermission(
+        req.permission.type,
+        req.permission.id,
+        req.permission.orgId,
+        req.permission.authMethod,
+        paramOrgId
+      );
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Insert, OrgPermissionSubjects.ConsumerSecrets);
 
-      const myOrgId = req.params.organizationId;
       const secretName = req.body.name;
 
-      // I can use .services.zodConsumerSecret here cuz I injected it in the server (index.ts of routes)
       const savedSecret = await server.services.consumerSecret.createSecret({
-        organizationId: myOrgId,
+        organizationId: paramOrgId,
         name: secretName,
         type: req.body.type,
         userId: "6e74f399-b138-4f4e-94ab-bd0827b1e4fe",
         secretValue: req.body.secretValue,
         secretComment: req.body.secretComment
       });
-
-      console.log("Saved secret", savedSecret);
 
       return {
         secret: savedSecret
@@ -230,12 +223,26 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      // TODO: 1. understand how to get the current userId (logged session)
-      // TODO: 2. understand how to get the organizationId
-      // TODO: 3. understand how to check if the user belongs to the organization
-      const consumerEditId = req.params.id;
+      // 1. get the consumer secret
+      const paramConsumerSecretId = req.params.id;
+      const consumerSecret = await server.services.consumerSecret.getAndDecryptSecretById(paramConsumerSecretId);
 
-      const updatedSecret = await server.services.consumerSecret.updateSecret(consumerEditId, {
+      // 2. check if user belongs to the organization in which the secret is
+      const orgId = consumerSecret.organizationId;
+
+      // if this does not throw, then the user has access to the organization
+      await server.services.permission.getOrgPermission(
+        req.permission.type,
+        req.permission.id,
+        req.permission.orgId,
+        req.permission.authMethod,
+        orgId
+      );
+
+      // TODO: enable check on the permission level
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Edit, OrgPermissionSubjects.ConsumerSecrets);
+
+      const updatedSecret = await server.services.consumerSecret.updateSecret(paramConsumerSecretId, {
         name: req.body.name,
         secretValue: req.body.secretValue,
         secretComment: req.body.secretComment
@@ -268,28 +275,26 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      const consumerSecretId = req.params.id;
+      const paramConsumerSecretId = req.params.id;
+      const consumerSecret = await server.services.consumerSecret.getSecretById(paramConsumerSecretId);
 
-      console.log("We want to delete", consumerSecretId);
+      // 2. check if user belongs to the organization in which the secret is
+      const orgId = consumerSecret.organizationId;
 
-      const existingSecret = await server.services.consumerSecret.getSecretById(consumerSecretId);
-
-      if (!existingSecret) {
-        throw new Error("Secret not found");
+      if (!orgId) {
+        throw new Error("Organization ID not found");
       }
 
-      // TODO: 1. understand how to get the current userId (logged session)
-      // is this existingSecret.userId == me
+      // if this does not throw, then the user has access to the organization
+      await server.services.permission.getOrgPermission(
+        req.permission.type,
+        req.permission.id,
+        req.permission.orgId,
+        req.permission.authMethod,
+        orgId
+      );
 
-      // TODO: 2. understand how to get the organizationId
-      // TODO: 4. understand if the secret belongs to the organization
-      // is this existingSecret.organizationId == orgId
-
-      // TODO: 3. understand how to check if the user belongs to the organization
-      // is this existingSecret.organizationId == me.myOrg
-
-      const deletedSecret = await server.services.consumerSecret.deleteSecretById(existingSecret.id);
-      console.log("Deleted secret", deletedSecret);
+      const deletedSecret = await server.services.consumerSecret.deleteSecretById(orgId);
 
       return deletedSecret;
     }

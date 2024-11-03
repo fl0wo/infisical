@@ -24,8 +24,7 @@ export const consumerSecretServiceFactory = ({ consumerSecretDAL }: TConsumerSec
    */
   const createSecret = async (body: TCreateConsumerSecretDTOInsert) => {
     const encConsumerSecret = encryptConsumerSecretModelDTO(body);
-
-    const addedSecret = await consumerSecretDAL.create({
+    return consumerSecretDAL.create({
       name: body.name,
       type: body.type,
       organizationId: body.organizationId,
@@ -34,20 +33,15 @@ export const consumerSecretServiceFactory = ({ consumerSecretDAL }: TConsumerSec
       encryptedValue: encConsumerSecret.secretValue,
       encryptedComment: encConsumerSecret.secretComment
     });
-
-    return addedSecret;
   };
 
   const updateSecret = async (id: string, body: TCreateConsumerSecretDTOUpdate) => {
     const encConsumerSecret = encryptConsumerSecretModelDTO(body);
-
-    const updatedSecret = await consumerSecretDAL.updateById(id, {
+    return consumerSecretDAL.updateById(id, {
       name: body.name,
       encryptedValue: encConsumerSecret.secretValue,
       encryptedComment: encConsumerSecret.secretComment
     });
-
-    return updatedSecret;
   };
 
   /**
