@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ConsumerSecretType } from "@app/db/schemas";
-import { secretsLimit } from "@app/server/config/rateLimiter";
+import { consumerSecretsLimit } from "@app/server/config/rateLimiter";
 import { verifyAuth } from "@app/server/plugins/auth/verify-auth";
 import { AuthMode } from "@app/services/auth/auth-type";
 
@@ -54,8 +54,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     method: "GET",
     url: "/list/:organizationId",
     config: {
-      // todo: add a custom rate limit for this endpoint
-      rateLimit: secretsLimit
+      rateLimit: consumerSecretsLimit
     },
     schema: {
       description: "List consumer secrets of an organization, to move faster, those secrets will already be decrypted.",
@@ -75,19 +74,27 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      // TODO: 1. understand how to get the current userId (logged session)
-      // const userId = req.permission.id; // is this the user id?
+      const paramOrganizationId = req.params.organizationId;
 
-      // TODO: 2. understand how to get the organizationId
-      // const paramOrganizationId = req.params.organizationId; // maybe it's better to use this?
+      const actor = req.permission.type;
+      const actorId = req.permission.id;
+      const actorOrgId = req.permission.orgId;
+      const actorAuthMethod = req.permission.authMethod;
 
-      // TODO: 3. understand how to check if the user belongs to the organization
-      const { orgId } = req.permission;
+      // if this does not throw, then the user has access to the organization
+      await server.services.permission.getOrgPermission(
+        actor,
+        actorId,
+        actorOrgId,
+        actorAuthMethod,
+        paramOrganizationId
+      );
 
-      console.log("How we list secrets in-call?", req.permission);
+      // TODO: enable check on the permission level
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.AuditLogs);
 
       const consumerSecretsOfOrganization =
-        await server.services.consumerSecret.listAndDecryptSecretsByOrganizationId(orgId);
+        await server.services.consumerSecret.listAndDecryptSecretsByOrganizationId(actorOrgId);
 
       return {
         consumerSecrets: consumerSecretsOfOrganization
@@ -99,8 +106,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     method: "GET",
     url: "/get/:consumerSecretId",
     config: {
-      // todo: add a custom rate limit for this endpoint
-      rateLimit: secretsLimit
+      rateLimit: consumerSecretsLimit
     },
     schema: {
       description: "Get a consumer secret by it's id",
@@ -120,24 +126,29 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      // TODO: probably can replace this with a permissionService dedicated
-      if (req.permission.type !== "user") {
-        throw new Error("You are not allowed to view this secret");
-      }
-
-      // TODO: 1. understand how to get the current userId (logged session)
-      // const userId = req.permission.id; // is this the user id?
-
-      // TODO: 2. understand how to get the organizationId
-      const paramConsumerSecretId = req.params.consumerSecretId; // maybe it's better to use this?
-      // const userId = req.permission.id;
-
-      // TODO: 3. understand how to check if the user belongs to the organization
-      // const { orgId } = req.permission;
-
+      // 1. get the consumer secret
+      const paramConsumerSecretId = req.params.consumerSecretId;
       const consumerSecret = await server.services.consumerSecret.getAndDecryptSecretById(paramConsumerSecretId);
 
-      console.log("Fetched sec", consumerSecret);
+      // 2. check if user belongs to the organization in which the secret is
+      const paramOrganizationId = consumerSecret.organizationId;
+
+      const actor = req.permission.type;
+      const actorId = req.permission.id;
+      const actorOrgId = req.permission.orgId;
+      const actorAuthMethod = req.permission.authMethod;
+
+      // if this does not throw, then the user has access to the organization
+      await server.services.permission.getOrgPermission(
+        actor,
+        actorId,
+        actorOrgId,
+        actorAuthMethod,
+        paramOrganizationId
+      );
+
+      // TODO: enable check on the permission level
+      // ForbiddenError.from(permission).throwUnlessCan(OrgPermissionActions.Read, OrgPermissionSubjects.AuditLogs);
 
       return { consumerSecret };
     }
@@ -147,8 +158,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     method: "POST",
     url: "/:organizationId",
     config: {
-      // todo: add a custom rate limit for this endpoint
-      rateLimit: secretsLimit
+      rateLimit: consumerSecretsLimit
     },
     schema: {
       description: "Create consumer secret under a organization of a userId",
@@ -199,8 +209,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     method: "PATCH",
     url: "/:id",
     config: {
-      // todo: add a custom rate limit for this endpoint
-      rateLimit: secretsLimit
+      rateLimit: consumerSecretsLimit
     },
     schema: {
       description: "Edit an existing consumer secret give its id",
@@ -240,7 +249,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     method: "DELETE",
     url: "/:id",
     config: {
-      rateLimit: secretsLimit
+      rateLimit: consumerSecretsLimit
     },
     schema: {
       description: "Delete a consumer secret by its id from the organization",

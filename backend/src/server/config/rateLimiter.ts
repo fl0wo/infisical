@@ -49,6 +49,14 @@ export const secretsLimit: RateLimitOptions = {
   keyGenerator: (req) => req.realIp
 };
 
+export const consumerSecretsLimit: RateLimitOptions = {
+  // secrets, folders, secret imports
+  timeWindow: 60 * 1000,
+  hook: "preValidation",
+  max: (req) => req.rateLimits.secretsLimit,
+  keyGenerator: (req) => req.realIp
+};
+
 export const authRateLimit: RateLimitOptions = {
   timeWindow: 60 * 1000,
   hook: "preValidation",

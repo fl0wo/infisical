@@ -788,7 +788,6 @@ export const registerRoutes = async (
     licenseService,
     folderDAL,
     secretDAL,
-    // TODO: would be interesting to snapshot the consumerSecrets as well
     snapshotDAL,
     snapshotFolderDAL,
     snapshotSecretDAL,
@@ -1263,8 +1262,8 @@ export const registerRoutes = async (
   });
 
   const consumerSecretsService = consumerSecretServiceFactory({
-    consumerSecretDAL
-    // permissionService
+    consumerSecretDAL,
+    permissionService
   });
 
   await superAdminService.initServerCfg();

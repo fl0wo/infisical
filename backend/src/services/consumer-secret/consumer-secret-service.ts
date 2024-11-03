@@ -1,6 +1,7 @@
 /* eslint-disable no-unreachable-loop */
 /* eslint-disable no-await-in-loop */
 
+import { TPermissionServiceFactory } from "@app/ee/services/permission/permission-service";
 import { TConsumerSecretDALFactory } from "@app/services/consumer-secret/consumer-secret-dal";
 import {
   decryptConsumerSecretToModelDTO,
@@ -11,7 +12,7 @@ import { TCreateConsumerSecretDTOInsert, TCreateConsumerSecretDTOUpdate } from "
 
 type TConsumerSecretServiceFactoryDep = {
   consumerSecretDAL: TConsumerSecretDALFactory;
-  // TODO: add permission service and other services as well
+  permissionService: TPermissionServiceFactory;
 };
 
 // TODO: implement the service that uses the DAL (Data Access Layer) to interact with the database
