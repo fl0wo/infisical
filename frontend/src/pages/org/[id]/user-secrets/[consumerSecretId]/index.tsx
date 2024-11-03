@@ -6,6 +6,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import ConsumerSecretDynamicForm from "@app/components/consumer-secrets/ConsumerSecretDynamicForm";
 import {createNotification} from "@app/components/notifications";
+import {TCreateConsumerSecretFormData} from "@app/components/utilities/consumer-secrets/types";
 import {Button, IconButton} from "@app/components/v2";
 import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
@@ -14,7 +15,6 @@ import {
     useUpdateOrganizationConsumerSecret
 } from "@app/hooks/api/consumer-secrets";
 import {useOrganizationConsumerSecret} from "@app/hooks/api/consumer-secrets/queries";
-import {TCreateConsumerSecretFormData} from "@app/pages/org/[id]/user-secrets";
 
 const ConsumerSecretInspectPage = withPermission(() => {
 
@@ -39,8 +39,6 @@ const ConsumerSecretInspectPage = withPermission(() => {
                 if (!consumerSecretId) {
                     throw new Error("Consumer Secret ID not found");
                 }
-
-                console.log("data to edit", data);
 
                 // TODO: not good, we're pushing the whole object every time instead of just the fields that actually changed find a way to do for the delta-diff of fields only
                 await updateConsumerSecretMutation.mutateAsync({
