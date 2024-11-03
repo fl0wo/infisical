@@ -5,7 +5,8 @@ import { TConsumerSecrets } from "@app/db/schemas/consumer-secrets";
 import { decryptSymmetric128BitHexKeyUTF8, encryptSymmetric128BitHexKeyUTF8 } from "@app/lib/crypto";
 import {
   TCreateConsumerSecretDTO,
-  TCreateConsumerSecretDTOInsert
+  TCreateConsumerSecretDTOInsert,
+  TCreateConsumerSecretDTOUpdate
 } from "@app/services/consumer-secret/consumer-secret-types";
 
 const tempKey = "01234567890123456789012345678901";
@@ -94,7 +95,13 @@ export const decryptConsumerSecretToModelDTO = (encryptedSecret: TConsumerSecret
   return x;
 };
 
-export const encryptConsumerSecretModelDTO = (body: TCreateConsumerSecretDTOInsert) => {
+export const encryptConsumerSecretModelDTO = (
+  body: TCreateConsumerSecretDTOInsert | TCreateConsumerSecretDTOUpdate
+) => {
+  if (!body.secretValue || !body.secretComment) {
+    throw new Error("secretValue or secretComment is missing on encryptConsumerSecretModelDTO");
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   // Is there a better way to do this?
   const stringifiedSecretValue = JSON.stringify(body.secretValue);

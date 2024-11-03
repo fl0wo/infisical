@@ -33,3 +33,6 @@ export type TCreateConsumerSecretDTO = {
 };
 
 export type TCreateConsumerSecretDTOInsert = Omit<TCreateConsumerSecretDTO, "id" | "createdAt" | "updatedAt">;
+export type TCreateConsumerSecretDTOUpdate = Partial<
+  Omit<TCreateConsumerSecretDTO, "id" | "createdAt" | "updatedAt" | "type" | "userId" | "organizationId">
+>;

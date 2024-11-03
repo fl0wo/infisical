@@ -195,9 +195,47 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     }
   });
 
-  // TODO: add PATCH
+  server.route({
+    method: "PATCH",
+    url: "/:id",
+    config: {
+      // todo: add a custom rate limit for this endpoint
+      rateLimit: secretsLimit
+    },
+    schema: {
+      description: "Edit an existing consumer secret give its id",
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      params: z.object({
+        id: z.string().trim().describe("Consumer Secret ID")
+      }),
+      body: createConsumerSecretRequest.partial().omit({
+        type: true
+      }),
+      response: {
+        200: z.boolean()
+      }
+    },
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
+    handler: async (req) => {
+      // TODO: 1. understand how to get the current userId (logged session)
+      // TODO: 2. understand how to get the organizationId
+      // TODO: 3. understand how to check if the user belongs to the organization
+      const consumerEditId = req.params.id;
 
-  // TODO: add DELETE
+      const updatedSecret = await server.services.consumerSecret.updateSecret(consumerEditId, {
+        name: req.body.name,
+        secretValue: req.body.secretValue,
+        secretComment: req.body.secretComment
+      });
+
+      return !!updatedSecret;
+    }
+  });
+
   server.route({
     method: "DELETE",
     url: "/:id",
