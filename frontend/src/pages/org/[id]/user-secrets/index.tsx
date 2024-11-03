@@ -82,8 +82,6 @@ const UserSecrets = withPermission(() => {
         ) => {
             try {
 
-                console.log("Creating secret...", data);
-
                 // The secret will be added regardless of it's content, the content will be saved as a JSON stringlyfied object
                 // The secret will be encrypted and saved in the database
                 // Why I'd keep the secret as a JSON and not as a separate table?
@@ -102,18 +100,18 @@ const UserSecrets = withPermission(() => {
                 // 4. I cant create relationships between fields of the content and other tables
                 // 5. No db constraints, just application constraints
 
+                console.log("data to push", data);
+
                 // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
                 await mutate.mutateAsync({
-                    organizationId: "organizationId",
-                    name: "my-consumer-secret",
-                    secretComment: "This is a fixed note",
+                    organizationId: "7cbe3e71-6cf5-4460-8a4d-9d1828330779",
+                    name: data.name,
+                    secretComment: data.notes,
                     type: data.type,
                     secretValue: data
                 });
 
-                console.log("Created secret!", data);
-
-                createNotification({text: "Ciao!", type: "success"});
+                createNotification({text: "Secret created!", type: "success"});
                 handlePopUpClose("addNewConsumerSecret");
             } catch (err) {
                 createNotification({text: "Failed to create project", type: "error"});

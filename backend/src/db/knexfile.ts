@@ -38,7 +38,8 @@ export default {
       directory: "./seeds"
     },
     migrations: {
-      tableName: "infisical_migrations"
+      tableName: "infisical_migrations",
+      disableMigrationsListValidation: true
     }
   },
   production: {

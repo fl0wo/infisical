@@ -7,7 +7,6 @@ import { AuthMode } from "@app/services/auth/auth-type";
 
 import { consumerSecretRawSchema } from "../sanitizedSchemas";
 
-// TODO: this is the router that will handle the consumer secrets in the backend
 const createConsumerSecretRequest = z.object({
   name: z.string().trim().describe("The name of the secret"),
   secretComment: z.string().trim().optional().default("").describe("the secret comment"),
@@ -104,7 +103,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       body: createConsumerSecretRequest,
       response: {
         200: z.object({
-          secret: consumerSecretRawSchema.optional()
+          secret: consumerSecretRawSchema.optional() // todo: remove this line
         })
       }
     },
@@ -119,6 +118,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
 
       console.log("Creating Consumer Secret request", req.url, req.body);
 
+      // I can use .services.consumerSecret here cuz it was injected in the server (index.ts of routes)
       const savedSecret = await server.services.consumerSecret.createSecret({
         organizationId: req.params.organizationId,
         name: req.body.name,
