@@ -69,6 +69,8 @@ export const decryptConsumerSecretToModelDTO = (encryptedSecret: TConsumerSecret
   });
 
   const x: TCreateConsumerSecretDTO = {
+    id: encryptedSecret.id,
+
     name: encryptedSecret.name,
 
     type: encryptedSecret.type as ConsumerSecretType,

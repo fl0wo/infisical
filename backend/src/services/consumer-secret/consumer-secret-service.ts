@@ -43,14 +43,16 @@ export const consumerSecretServiceFactory = ({ consumerSecretDAL }: TConsumerSec
    */
   const listAndDecryptSecretsByOrganizationId = async (organizationId: string) => {
     const secrets = await consumerSecretDAL.listByOrganizationId(organizationId);
-    console.log("Received secrets", secrets);
-    const decrypted = secrets.map(decryptConsumerSecretToModelDTO);
-    console.log("Decrypted secrets", decrypted);
-    return decrypted;
+    return secrets.map(decryptConsumerSecretToModelDTO);
+  };
+
+  const deleteSecretById = async (id: string) => {
+    return consumerSecretDAL.deleteByConsumerSecretId(id);
   };
 
   return {
     createSecret,
-    listAndDecryptSecretsByOrganizationId
+    listAndDecryptSecretsByOrganizationId,
+    deleteSecretById
   };
 };

@@ -35,9 +35,18 @@ export const consumerSecretDALFactory = (db: TDbClient) => {
     }
   };
 
+  const deleteByConsumerSecretId = async (id: string) => {
+    try {
+      return await db(TableName.ConsumerSecret).where({ id }).delete();
+    } catch (error) {
+      throw new DatabaseError({ error, name: "delete secrets by id" });
+    }
+  };
+
   return {
     ...secretOrm,
     create,
-    listByOrganizationId
+    listByOrganizationId,
+    deleteByConsumerSecretId
   };
 };

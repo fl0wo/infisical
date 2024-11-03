@@ -142,5 +142,45 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     }
   });
 
-  // TODO: add PATCH and DELETE (look how they do in secret-router.ts)
+  // TODO: add PATCH
+
+  // TODO: add DELETE
+  server.route({
+    method: "DELETE",
+    url: "/:id",
+    config: {
+      rateLimit: secretsLimit
+    },
+    schema: {
+      description: "Delete a consumer secret by it's id from the organization",
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      params: z.object({
+        id: z.string().trim().describe("The consumer secret ID")
+      }),
+      body: createConsumerSecretRequest,
+      response: {
+        200: z.number().describe("The number of deleted secrets")
+      }
+    },
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
+    handler: async (req) => {
+      // TODO: 1. understand how to get the current userId (logged session)
+      // TODO: 2. understand how to get the organizationId
+      // TODO: 3. understand how to check if the user belongs to the organization
+      // TODO: 4. understand if the secret belongs to the organization
+
+      console.log("Creating Consumer Secret request", req.url, req.body);
+
+      // I can use .services.consumerSecret here cuz I injected it in the server (index.ts of routes)
+      const savedSecret = await server.services.consumerSecret.deleteSecretById("");
+
+      console.log("Saved secret", savedSecret);
+
+      return 0;
+    }
+  });
 };

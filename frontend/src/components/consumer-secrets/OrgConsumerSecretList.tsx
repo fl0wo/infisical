@@ -56,7 +56,9 @@ export const OrgConsumerSecretList = ({
                                 <Td>{timeSince(new Date(secret.createdAt ?? Date.now()))}</Td>
                                 <Td>{secret.name}</Td>
                                 <Td>
-                                    {secret.type}
+                                    {secret.type === "website_login" && "Website Login"}
+                                    {secret.type === "credit_card" && "Credit Card"}
+                                    {secret.type === "secure_note" && "Secure Note"}
                                 </Td>
                                 <Td>
                                     {secret.secretComment}

@@ -1,6 +1,7 @@
 import { ConsumerSecretType } from "@app/db/schemas";
 
 export type TCreateConsumerSecretDTO = {
+  id?: string | null | undefined;
   organizationId?: string | null | undefined;
   name: string;
   secretComment: string;
