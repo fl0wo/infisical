@@ -64,13 +64,12 @@ export const useDeleteOrganizationConsumerSecret = () => {
 
     return useMutation({
         mutationFn: async ({
-                               organizationId,
                                id
                            }: {
             organizationId: string;
             id: string;
         }) => {
-            const {data} = await apiRequest.delete(`/api/v3/consumer-secrets/${organizationId}/${id}`);
+            const {data} = await apiRequest.delete(`/api/v3/consumer-secrets/${id}`);
             return data;
         },
         onSuccess: (_, {organizationId}) => {

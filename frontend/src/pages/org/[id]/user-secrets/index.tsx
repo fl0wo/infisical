@@ -14,10 +14,11 @@ import {OrgConsumerSecretList} from "@app/components/consumer-secrets/OrgConsume
 import {createNotification} from "@app/components/notifications";
 import {OrgPermissionCan} from "@app/components/permissions";
 import {Button, Modal, ModalContent, Select, SelectItem} from "@app/components/v2";
-import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
+import {OrgPermissionActions, OrgPermissionSubjects, useOrganization} from "@app/context";
 import {withPermission} from "@app/hoc";
 import {usePopUp} from "@app/hooks";
 import {useCreateOrganizationConsumerSecret, useOrganizationConsumerSecrets} from "@app/hooks/api/consumer-secrets";
+import SettingsOrg from "@app/pages/org/[id]/settings";
 
 const consumerSecretTypes = [
     {
@@ -70,7 +71,9 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
-        const currentOrgId = "7cbe3e71-6cf5-4460-8a4d-9d1828330779";
+        const {currentOrg} = useOrganization();
+
+        const currentOrgId = currentOrg?.id;
 
         const {
             data: orgConsumerSecrets,
@@ -88,23 +91,9 @@ const UserSecrets = withPermission(() => {
         ) => {
             try {
 
-                // The secret will be added regardless of it's content, the content will be saved as a JSON stringlyfied object
-                // The secret will be encrypted and saved in the database
-                // Why I'd keep the secret as a JSON and not as a separate table?
-
-                // PROS of keeping the content as a JSON in the db instead of hierarchical tables:
-                // 1. If i need to add fields to the secret, I can do it without changing the db's schema
-                // 2. If i need new types of secrets, I can do it without changing the db's schema
-                // 3. I can easily retrieve the secrets without having to join tables
-                // 4. As an MVP this is the fastest way to implement it
-                // 5. I do not want to build query to filter based on secret's fields (e.g. find all credit cards that start with 2384) (maybe at max I'd need to do a fuzzy search (full-text))
-
-                // CONS of keeping the content as a JSON in the db instead of hierarchical tables:
-                // 1. Cannot enforce the schema of the content
-                // 2. Cannot enforce the types of the content
-                // 3. Field's uniqueness and indexes cannot exist
-                // 4. I cant create relationships between fields of the content and other tables
-                // 5. No db constraints, just application constraints
+                if(!currentOrgId) {
+                    throw new Error("Organization ID not found");
+                }
 
                 console.log("data to push", data);
 
@@ -197,9 +186,6 @@ const UserSecrets = withPermission(() => {
                         {/* list all current consumer secrets */}
 
                         <div className="mt-6">
-                            <div className="text-lg font-semibold text-gray-200">
-                                Current Consumer Secrets
-                            </div>
                             <div className="mt-2">
                                 {
                                     isOrgConsumerSecretsLoading ? (
@@ -210,31 +196,10 @@ const UserSecrets = withPermission(() => {
                                             isLoading={isOrgConsumerSecretsLoading}
                                             consumerSecrets={orgConsumerSecrets}
                                         />
-                                        // <div>
-                                        //     {
-                                        //         orgConsumerSecrets?.map((consumerSecret:TConsumerSecretFetched) => (
-                                        //             <div key={consumerSecret.name}>
-                                        //                 <div>
-                                        //                     {consumerSecret.name}
-                                        //                 </div>
-                                        //                 <div>
-                                        //                     {consumerSecret.type}
-                                        //                 </div>
-                                        //                 <div>
-                                        //                     {consumerSecret.secretComment}
-                                        //                 </div>
-                                        //                 <div>
-                                        //                     {JSON.stringify(consumerSecret.secretValue)}
-                                        //                 </div>
-                                        //             </div>
-                                        //         ))
-                                        //     }
-                                        // </div>
                                     )
                                 }
                             </div>
                         </div>
-
                     </div>
 
 
@@ -303,5 +268,7 @@ const UserSecrets = withPermission(() => {
 Object.assign(UserSecrets, {
     requireAuth: true
 });
+
+SettingsOrg.requireAuth = true;
 
 export default UserSecrets;

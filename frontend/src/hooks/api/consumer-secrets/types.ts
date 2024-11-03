@@ -34,6 +34,9 @@ export type SecureNoteContent = {
 
 
 export type TConsumerSecretFetched = {
+
+    id: string,
+
     type: "website_login" | "credit_card" | "secure_note",
     name: string,
 

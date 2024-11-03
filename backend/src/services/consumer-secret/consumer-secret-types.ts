@@ -1,12 +1,13 @@
 import { ConsumerSecretType } from "@app/db/schemas";
 
 export type TCreateConsumerSecretDTO = {
-  id?: string | null | undefined;
-  organizationId?: string | null | undefined;
+  id: string;
+  organizationId: string;
+  userId: string;
+
   name: string;
   secretComment: string;
   type: ConsumerSecretType;
-  userId?: string | null | undefined;
 
   createdAt?: Date;
   updatedAt?: Date;
@@ -30,3 +31,5 @@ export type TCreateConsumerSecretDTO = {
         note: string;
       };
 };
+
+export type TCreateConsumerSecretDTOInsert = Omit<TCreateConsumerSecretDTO, "id" | "createdAt" | "updatedAt">;

@@ -43,10 +43,21 @@ export const consumerSecretDALFactory = (db: TDbClient) => {
     }
   };
 
+  const getByConsumerSecretId = async (id: string) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const x = await db(TableName.ConsumerSecret).where({ id }).first();
+      return x as unknown as TConsumerSecrets;
+    } catch (error) {
+      throw new DatabaseError({ error, name: "get secrets by id" });
+    }
+  };
+
   return {
     ...secretOrm,
     create,
     listByOrganizationId,
-    deleteByConsumerSecretId
+    deleteByConsumerSecretId,
+    getByConsumerSecretId
   };
 };

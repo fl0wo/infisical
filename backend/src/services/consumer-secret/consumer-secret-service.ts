@@ -7,7 +7,7 @@ import {
   encryptConsumerSecretModelDTO
 } from "@app/services/consumer-secret/consumer-secrets-enc-utils";
 
-import { TCreateConsumerSecretDTO } from "./consumer-secret-types";
+import { TCreateConsumerSecretDTOInsert } from "./consumer-secret-types";
 
 type TConsumerSecretServiceFactoryDep = {
   consumerSecretDAL: TConsumerSecretDALFactory;
@@ -21,14 +21,14 @@ export const consumerSecretServiceFactory = ({ consumerSecretDAL }: TConsumerSec
    * Creates a consumer secret
    * @param body
    */
-  const createSecret = async (body: TCreateConsumerSecretDTO) => {
+  const createSecret = async (body: TCreateConsumerSecretDTOInsert) => {
     const encConsumerSecret = encryptConsumerSecretModelDTO(body);
 
     const addedSecret = await consumerSecretDAL.create({
       name: body.name,
       type: body.type,
       organizationId: body.organizationId,
-      userId: "6e74f399-b138-4f4e-94ab-bd0827b1e4fe", // just inserting to me kekekeke
+      userId: body.userId,
 
       encryptedValue: encConsumerSecret.secretValue,
       encryptedComment: encConsumerSecret.secretComment
@@ -50,9 +50,14 @@ export const consumerSecretServiceFactory = ({ consumerSecretDAL }: TConsumerSec
     return consumerSecretDAL.deleteByConsumerSecretId(id);
   };
 
+  const getSecretById = async (id: string) => {
+    return consumerSecretDAL.getByConsumerSecretId(id);
+  };
+
   return {
     createSecret,
     listAndDecryptSecretsByOrganizationId,
-    deleteSecretById
+    deleteSecretById,
+    getSecretById
   };
 };

@@ -68,14 +68,18 @@ export const decryptConsumerSecretToModelDTO = (encryptedSecret: TConsumerSecret
     key: tempKey
   });
 
+  if (!secretValueText || !secretCommentText || !encryptedSecret.userId || !encryptedSecret.organizationId) {
+    throw new Error("Failed to decrypt secret");
+  }
+
   const x: TCreateConsumerSecretDTO = {
     id: encryptedSecret.id,
-
-    name: encryptedSecret.name,
-
-    type: encryptedSecret.type as ConsumerSecretType,
     userId: encryptedSecret.userId,
     organizationId: encryptedSecret.organizationId,
+
+    name: encryptedSecret.name,
+    type: encryptedSecret.type as ConsumerSecretType,
+
     createdAt: encryptedSecret.createdAt,
     updatedAt: encryptedSecret.updatedAt,
 

@@ -29,7 +29,7 @@ const zodDynamicConsumerSecretValueType = z.discriminatedUnion("type", [
 
 const createConsumerSecretRequest = z.object({
   name: z.string().trim().describe("The name of the secret"),
-  secretComment: z.string().trim().optional().default("").describe("the secret comment"),
+  secretComment: z.string().trim().optional().default("").describe("The secret comment"),
   type: z.nativeEnum(ConsumerSecretType).describe("Either website_login, credit_card or secure_note"),
 
   secretValue: zodDynamicConsumerSecretValueType
@@ -57,6 +57,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
         200: z.object({
           consumerSecrets: z
             .object({
+              id: z.string().uuid(),
               name: z.string(),
 
               secretValue: zodDynamicConsumerSecretValueType,
@@ -125,11 +126,15 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
 
       console.log("Creating Consumer Secret request", req.url, req.body);
 
+      const myOrgId = req.params.organizationId;
+      const secretName = req.body.name;
+
       // I can use .services.consumerSecret here cuz I injected it in the server (index.ts of routes)
       const savedSecret = await server.services.consumerSecret.createSecret({
-        organizationId: req.params.organizationId,
-        name: req.body.name,
+        organizationId: myOrgId,
+        name: secretName,
         type: req.body.type,
+        userId: "6e74f399-b138-4f4e-94ab-bd0827b1e4fe",
         secretValue: req.body.secretValue,
         secretComment: req.body.secretComment
       });
@@ -168,15 +173,27 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      // TODO: 1. understand how to get the current userId (logged session)
-      // TODO: 2. understand how to get the organizationId
-      // TODO: 3. understand how to check if the user belongs to the organization
-      // TODO: 4. understand if the secret belongs to the organization
-
       console.log("Creating Consumer Secret request", req.url, req.body);
 
-      // I can use .services.consumerSecret here cuz I injected it in the server (index.ts of routes)
-      const savedSecret = await server.services.consumerSecret.deleteSecretById("");
+      const consumerSecretId = req.params.id;
+
+      const existingSecret = await server.services.consumerSecret.getSecretById(consumerSecretId);
+
+      if (!existingSecret) {
+        throw new Error("Secret not found");
+      }
+
+      // TODO: 1. understand how to get the current userId (logged session)
+      // is this existingSecret.userId == me
+
+      // TODO: 2. understand how to get the organizationId
+      // TODO: 4. understand if the secret belongs to the organization
+      // is this existingSecret.organizationId == orgId
+
+      // TODO: 3. understand how to check if the user belongs to the organization
+      // is this existingSecret.organizationId == me.myOrg
+
+      const savedSecret = await server.services.consumerSecret.deleteSecretById(existingSecret.id);
 
       console.log("Saved secret", savedSecret);
 

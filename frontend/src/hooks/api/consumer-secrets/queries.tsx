@@ -6,14 +6,16 @@ export const consumerSecretKeys = {
   forOrganizationConsumerSecrets: (organizationId: string) => ["consumer-secrets", organizationId] as const,
 };
 
-export const useOrganizationConsumerSecrets = (organizationId: string) => {
+export const useOrganizationConsumerSecrets = (organizationId?: string) => {
   return useQuery({
-    queryKey: consumerSecretKeys.forOrganizationConsumerSecrets(organizationId),
+    queryKey: consumerSecretKeys.forOrganizationConsumerSecrets(organizationId!),
     queryFn: async () => {
       const { data } = await apiRequest.get(`/api/v3/consumer-secrets/${organizationId}`);
       return data;
     },
     select: (data) => data.consumerSecrets,
     staleTime: 0,
+
+    enabled: !!organizationId,
   });
 };
