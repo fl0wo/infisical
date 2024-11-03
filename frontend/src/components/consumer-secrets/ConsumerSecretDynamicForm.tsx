@@ -1,7 +1,13 @@
 import CreateConsumerCreditCard from "@app/components/consumer-secrets/CreateConsumerCreditCard";
+import CreateConsumerSecureNote from "@app/components/consumer-secrets/CreateConsumerSecureNote";
 import {CreateConsumerWebsiteLogin} from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
 import {TCreateConsumerSecretFormData} from "@app/components/utilities/consumer-secrets/types";
-import {CreditCardContent, TConsumerSecretFetched, WebsiteLoginContent} from "@app/hooks/api/consumer-secrets/types";
+import {
+    CreditCardContent,
+    SecureNoteContent,
+    TConsumerSecretFetched,
+    WebsiteLoginContent
+} from "@app/hooks/api/consumer-secrets/types";
 
 export default function ConsumerSecretDynamicForm({
                                                       type,
@@ -44,8 +50,20 @@ export default function ConsumerSecretDynamicForm({
                     ...(currentSecret?.secretValue as CreditCardContent ?? {}),
                 }}
             />;
-        // case "secure_note":
-        //     return <CreateConsumerSecureNote onSubmit={onSubmit} renderActions={renderActions} />;
+        case "secure_note":
+            return <CreateConsumerSecureNote
+                onSubmit={onSubmit}
+                onFormFieldsChanged={onFormFieldsChanged}
+                renderActions={renderActions}
+                currentSecret={{
+                    type: "secure_note",
+                    notes: currentSecret?.secretComment ?? "",
+                    name: currentSecret?.name ?? "",
+
+                    ...(currentSecret?.secretValue as SecureNoteContent ?? {}),
+                }}
+            />;
+        // add more dynamic forms here
         default:
             return null;
     }

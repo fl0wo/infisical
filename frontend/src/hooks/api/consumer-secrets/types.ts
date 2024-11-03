@@ -23,7 +23,6 @@ export type SecureNoteContent = {
     note: string
 }
 
-
 export type TConsumerSecretFetched = {
 
     id: string,

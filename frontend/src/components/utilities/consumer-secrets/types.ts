@@ -64,8 +64,7 @@ export const creditCardSchema = yup.object({
 
 export type TCreateConsumerSecretCreditCardFormData = yup.InferType<typeof creditCardSchema>;
 
-
-const secureNoteSchema = yup.object({
+export const secureNoteSchema = yup.object({
     type: yup
         .string()
         .default("secure_note"),
@@ -81,7 +80,7 @@ const secureNoteSchema = yup.object({
         .max(256, "Too long, maximum length is 256 characters"),
 
     // secure note related fields only
-    content: yup.string().required("Content is required for secure note")
+    note: yup.string().required("Content is required for secure note")
 });
 
 export type TCreateConsumerSecretSecureNoteFormData = yup.InferType<typeof secureNoteSchema>;
