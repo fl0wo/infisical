@@ -39,6 +39,9 @@ const UserSecrets = withPermission(() => {
         const onCreateConsumerSecret = async (
             data: TCreateConsumerSecretFormData["data"]
         ) => {
+
+            console.log("Arrived", data);
+
             try {
 
                 if (!currentOrgId) {
@@ -87,7 +90,7 @@ const UserSecrets = withPermission(() => {
                         className="ml-4"
                         type="submit"
                     >
-                        Create Consumer Secret
+                        Create Secret
                     </Button>
                 </div>
             </div>
@@ -111,7 +114,6 @@ const UserSecrets = withPermission(() => {
                             Create and manage your consumer secrets to centralize your organization&apos;s non-technical secrets.
                         </div>
 
-
                         <div
                             className="relative mb-6 flex justify-between rounded-md border border-mineshaft-600 bg-mineshaft-800 p-6">
                             <div className="flex flex-col items-start">
@@ -134,12 +136,11 @@ const UserSecrets = withPermission(() => {
                                             colorSchema="primary"
                                             leftIcon={<FontAwesomeIcon icon={faPlus}/>}
                                             onClick={() => {
-                                                console.log("Create new user secret");
                                                 handlePopUpOpen("addNewConsumerSecret");
                                             }}
                                             className="ml-2"
                                         >
-                                            Add New Consumer Secret
+                                            Add New User Secret
                                         </Button>
                                     )}
                                 </OrgPermissionCan>
