@@ -3,6 +3,7 @@ import {useRouter} from "next/router";
 import {faBackward} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
+import ConsumerSecretDynamicForm from "@app/components/consumer-secrets/ConsumerSecretDynamicForm";
 import {IconButton} from "@app/components/v2";
 import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
@@ -15,7 +16,7 @@ const ConsumerSecretInspectPage = withPermission(() => {
         const consumerSecretId = router.query.consumerSecretId as string;
 
         const {
-            data,
+            data:consumerSecretFetched,
             isLoading
         } = useOrganizationConsumerSecret(consumerSecretId);
 
@@ -52,21 +53,21 @@ const ConsumerSecretInspectPage = withPermission(() => {
                     <div className="mt-6">
                         <div className="mt-2">
 
-                            {/* <ConsumerSecretDynamicForm */}
-                            {/*    type={selectedConsumerSecretType} */}
-                            {/*    onSubmit={onCreateConsumerSecret} */}
-                            {/*    renderActions={renderFormsActions} */}
-                            {/* /> */}
-
                             {
                                 isLoading && <div>Loading...</div>
                             }
 
                             {
-                                !isLoading && <div>
-                                    {
-                                        JSON.stringify(data)
-                                    }
+                                !isLoading && consumerSecretFetched && <div>
+                                    <ConsumerSecretDynamicForm
+                                        type={consumerSecretFetched.type}
+                                        onSubmit={(a:any) => {
+                                            console.log(a);
+                                        }}
+                                        renderActions={() => null}
+                                        currentSecret={consumerSecretFetched}
+                                    />
+
                                 </div>
                             }
 

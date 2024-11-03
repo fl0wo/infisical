@@ -28,12 +28,17 @@ export const consumerSecretWebsiteLogin = yup.object({
 
 export type TCreateConsumerSecretWebsiteLoginFormData = yup.InferType<typeof consumerSecretWebsiteLogin>;
 
-export const CreateConsumerWebsiteLogin = ({onSubmit, renderActions}: {
+export const CreateConsumerWebsiteLogin = ({
+                                               onSubmit,
+                                               renderActions,
+                                               currentSecret
+}: {
     onSubmit: (data: TCreateConsumerSecretWebsiteLoginFormData) => void;
     renderActions: (
         isSubmitting: boolean,
         resetFormFields: () => void
     ) => React.ReactNode;
+    currentSecret?: TCreateConsumerSecretWebsiteLoginFormData;
 }) => {
 
     const {
@@ -44,8 +49,9 @@ export const CreateConsumerWebsiteLogin = ({onSubmit, renderActions}: {
     } = useForm<TCreateConsumerSecretWebsiteLoginFormData>({
         resolver: yupResolver(consumerSecretWebsiteLogin),
         defaultValues: {
-            type: "website_login" // do I really need to keep this? or line 8 is enough?
-        }
+            type: "website_login", // do I really need to keep this? or line 8 is enough?
+            ...currentSecret
+        },
     });
 
     return (
