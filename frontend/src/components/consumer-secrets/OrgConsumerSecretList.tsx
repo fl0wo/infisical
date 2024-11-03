@@ -9,7 +9,7 @@ export const OrgConsumerSecretList = ({
                                           consumerSecrets,
                                           isLoading
                                       }: {
-    consumerSecrets: TConsumerSecretFetched[],
+    consumerSecrets?: TConsumerSecretFetched[],
     isLoading: boolean
 }) => {
 
@@ -29,7 +29,6 @@ export const OrgConsumerSecretList = ({
                 {!isLoading &&
                     consumerSecrets &&
                     consumerSecrets
-                        ?.toSorted((a, b) => new Date(b.createdAt ?? Date.now()).getTime() - new Date(a.createdAt ?? Date.now()).getTime())
                         ?.map((secret) => {
                         return (
                             <Tr

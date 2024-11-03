@@ -49,3 +49,7 @@ export type TConsumerSecretFetched = {
     secretComment: string,
     secretValue: WebsiteLoginContent | CreditCardContent | SecureNoteContent,
 }
+
+export type TConsumerSecretFetchedResponse = {
+    consumerSecrets:TConsumerSecretFetched[]
+}
