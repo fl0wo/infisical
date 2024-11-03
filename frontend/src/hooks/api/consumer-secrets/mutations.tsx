@@ -28,7 +28,11 @@ export const useCreateOrganizationConsumerSecret = () => {
             return data;
         },
         onSuccess: (_, {organizationId}) => {
-            queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
+            // wait 2sec
+            setTimeout(() => {
+                queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
+            }, 2000);
+            // queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
         }
     });
 };

@@ -1,5 +1,6 @@
 import {faEdit, faEye, faRemove} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {twMerge} from "tailwind-merge";
 
 import {IconButton, Table, TableContainer, TableSkeleton, TBody, Td, Th, THead, Tr} from "@app/components/v2";
 import timeSince from "@app/ee/utilities/timeSince";
@@ -12,6 +13,8 @@ export const OrgConsumerSecretList = ({
     consumerSecrets: TConsumerSecretFetched[],
     isLoading: boolean
 }) => {
+
+
     return <TableContainer className="mt-8">
         <Table>
             <THead>
@@ -28,9 +31,28 @@ export const OrgConsumerSecretList = ({
             <TBody>
                 {!isLoading &&
                     consumerSecrets &&
-                    consumerSecrets?.map((secret) => {
+                    consumerSecrets
+                        ?.toSorted((a, b) => new Date(b.createdAt ?? Date.now()).getTime() - new Date(a.createdAt ?? Date.now()).getTime())
+                        ?.map((secret) => {
                         return (
-                            <Tr key={secret.name + secret.createdAt} className="h-10">
+                            <Tr
+                                onClick={() => {
+                                  // open popup with show secret
+                                }}
+                                key={secret.name + secret.createdAt}
+                                className={
+                                    twMerge(
+                                        "h-10",
+                                        "opacity-80 hover:opacity-100 cursor-pointer",
+                                        "transition-colors",
+                                        "duration-200",
+                                        "border-b",
+                                        "border-gray-200",
+                                        // less than 10sec ago? Show as new and highlight green
+                                        Date.now() - new Date(secret.createdAt ?? Date.now()).getTime() < 10 * 1000 && "bg-primary text-black",
+                                    )
+                                }
+                            >
                                 <Td>{timeSince(new Date(secret.createdAt ?? Date.now()))}</Td>
                                 <Td>{secret.name}</Td>
                                 <Td>
@@ -40,7 +62,7 @@ export const OrgConsumerSecretList = ({
                                     {secret.secretComment}
                                 </Td>
                                 <Td>
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center gap-2">
                                         <IconButton
                                             variant="outline_bg"
                                             colorSchema="primary"

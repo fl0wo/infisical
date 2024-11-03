@@ -70,10 +70,12 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
+        const currentOrgId = "7cbe3e71-6cf5-4460-8a4d-9d1828330779";
+
         const {
             data: orgConsumerSecrets,
             isLoading: isOrgConsumerSecretsLoading,
-        } = useOrganizationConsumerSecrets("organizationId");
+        } = useOrganizationConsumerSecrets(currentOrgId);
 
         console.log("Replied data", orgConsumerSecrets);
 
@@ -109,7 +111,7 @@ const UserSecrets = withPermission(() => {
                 // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
                 await mutate.mutateAsync({
                     // fixme: understand how to get the CURRENT organizationId
-                    organizationId: "7cbe3e71-6cf5-4460-8a4d-9d1828330779",
+                    organizationId: currentOrgId,
                     name: data.name,
                     secretComment: data.notes,
                     type: data.type,
