@@ -67,11 +67,16 @@ const ConsumerSecretInspectPage = withPermission(() => {
                         <Button
                             key="layout-delete-consumer-secret"
                             onClick={() => {
-                                deleteConsumerSecretMutation.mutateAsync({id:consumerSecretId});
+                                deleteConsumerSecretMutation
+                                    .mutateAsync({id:consumerSecretId})
+                                    .then(() => {
+                                        createNotification({text: "Secret deleted!", type: "success"});
+                                        router.push(router.asPath.split("/").slice(0, -1).join("/"));
+                                    });
                             }}
                             colorSchema="danger"
                             variant="outline_bg"
-                            className="py-2 w-36"
+                            className="py-2"
                         >
                             Delete{isSubmitting ? "ing" : ""} {consumerSecretFetched?.name}
                         </Button>

@@ -205,25 +205,25 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       rateLimit: secretsLimit
     },
     schema: {
-      description: "Delete a consumer secret by it's id from the organization",
+      description: "Delete a consumer secret by its id from the organization",
       security: [
         {
           bearerAuth: []
         }
       ],
       params: z.object({
-        id: z.string().trim().describe("The consumer secret ID")
+        id: z.string().trim().describe("The ID of the secret to delete")
       }),
-      body: createConsumerSecretRequest,
+      body: z.null(),
       response: {
-        200: z.number().describe("The number of deleted secrets")
+        200: z.number().describe("The number of deleted secrets should always be 1 or 0")
       }
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
     handler: async (req) => {
-      console.log("Creating Consumer Secret request", req.url, req.body);
-
       const consumerSecretId = req.params.id;
+
+      console.log("We want to delete", consumerSecretId);
 
       const existingSecret = await server.services.consumerSecret.getSecretById(consumerSecretId);
 
@@ -241,11 +241,10 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       // TODO: 3. understand how to check if the user belongs to the organization
       // is this existingSecret.organizationId == me.myOrg
 
-      const savedSecret = await server.services.consumerSecret.deleteSecretById(existingSecret.id);
+      const deletedSecret = await server.services.consumerSecret.deleteSecretById(existingSecret.id);
+      console.log("Deleted secret", deletedSecret);
 
-      console.log("Saved secret", savedSecret);
-
-      return 0;
+      return deletedSecret;
     }
   });
 };
