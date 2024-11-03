@@ -36,7 +36,7 @@ export default function CreateConsumerCreditCard({
 
     const {
         control,
-        formState: { isSubmitting },
+        formState: {isSubmitting},
         reset,
         handleSubmit
     } = useForm<TCreateConsumerSecretCreditCardFormData>({
@@ -92,8 +92,8 @@ export default function CreateConsumerCreditCard({
                                 placeholder="Type your card number"
                                 type="number"
                                 value={state.number}
-                                onChange={(val)=>{
-                                    if(val.target.value.length > 19){
+                                onChange={(val) => {
+                                    if (val.target.value.length > 19) {
                                         return;
                                     }
                                     setState((prev) => ({
@@ -130,7 +130,7 @@ export default function CreateConsumerCreditCard({
                                 {...field}
                                 onChangeCapture={onFormFieldsChanged}
                                 value={state.name}
-                                onChange={(val)=>{
+                                onChange={(val) => {
                                     setState((prev) => ({
                                         ...prev,
                                         name: val.target.value,
@@ -163,8 +163,8 @@ export default function CreateConsumerCreditCard({
                                 {...field}
                                 onChangeCapture={onFormFieldsChanged}
                                 value={state.expiry}
-                                onChange={(val)=>{
-                                    if(val.target.value.length > 4){
+                                onChange={(val) => {
+                                    if (val.target.value.length > 4) {
                                         return;
                                     }
                                     setState((prev) => ({
@@ -199,8 +199,8 @@ export default function CreateConsumerCreditCard({
                                 {...field}
                                 onChangeCapture={onFormFieldsChanged}
                                 value={state.cvc}
-                                onChange={(val)=>{
-                                    if(val.target.value.length > 3){
+                                onChange={(val) => {
+                                    if (val.target.value.length > 3) {
                                         return;
                                     }
                                     setState((prev) => ({
@@ -240,5 +240,5 @@ export default function CreateConsumerCreditCard({
 
             </form>
         </div>
-);
+    );
 }
