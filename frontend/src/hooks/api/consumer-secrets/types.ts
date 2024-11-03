@@ -1,25 +1,26 @@
 export type TConsumerSecret = {
-  type: "website_login" | "credit_card" | "secure_note",
-  name: string,
-  note?: string,
+    type: "website_login" | "credit_card" | "secure_note",
+    name: string,
+    note?: string,
 
-  secret: WebsiteLoginContent | CreditCardContent | SecureNoteContent
+    secret: WebsiteLoginContent | CreditCardContent | SecureNoteContent
 }
 
 export type WebsiteLoginContent = {
-  username: string,
-  password: string,
-  url: string
+    username: string,
+    password: string,
+    url: string
 }
 
 export type CreditCardContent = {
-  cardNumber: string,
-  expirationDate: string,
-  cvv: string
+    cardNumber: string,
+    expirationDate: string,
+    cvv: string,
+    cardHolderName: string
 }
 
 export type SecureNoteContent = {
-  note: string
+    note: string
 }
 
 
@@ -41,5 +42,5 @@ export type TConsumerSecretFetched = {
 }
 
 export type TConsumerSecretFetchedResponse = {
-    consumerSecrets:TConsumerSecretFetched[]
+    consumerSecrets: TConsumerSecretFetched[]
 }

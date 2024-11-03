@@ -1,4 +1,4 @@
-// TODO: we should Instead use a service dedicated to encryption and decryption and blob handling, but to go faster I just created a file like this
+// TODO: Use instead a service dedicated to encryption and decryption and blob handling, but to go faster I just created a file like this
 // Convert base64 to buffer and back
 
 import { ConsumerSecretType } from "@app/db/schemas";
@@ -89,7 +89,7 @@ export const decryptConsumerSecretToModelDTO = (encryptedSecret: TConsumerSecret
     createdAt: encryptedSecret.createdAt,
     updatedAt: encryptedSecret.updatedAt,
 
-    // fixme: JSON.parse a bit risky here don't you think?
+    // find a safer way
     secretValue: JSON.parse(secretValueText) as TCreateConsumerSecretDTO["secretValue"],
     secretComment: secretCommentText
   };

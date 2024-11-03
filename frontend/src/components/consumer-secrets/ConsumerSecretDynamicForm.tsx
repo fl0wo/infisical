@@ -1,6 +1,7 @@
+import CreateConsumerCreditCard from "@app/components/consumer-secrets/CreateConsumerCreditCard";
 import {CreateConsumerWebsiteLogin} from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
-import {TConsumerSecretFetched, WebsiteLoginContent} from "@app/hooks/api/consumer-secrets/types";
-import {TCreateConsumerSecretFormData} from "@app/pages/org/[id]/user-secrets";
+import {TCreateConsumerSecretFormData} from "@app/components/utilities/consumer-secrets/types";
+import {CreditCardContent, TConsumerSecretFetched, WebsiteLoginContent} from "@app/hooks/api/consumer-secrets/types";
 
 export default function ConsumerSecretDynamicForm({
                                                       type,
@@ -29,8 +30,20 @@ export default function ConsumerSecretDynamicForm({
                     ...(currentSecret?.secretValue as WebsiteLoginContent ?? {}),
                 }}
             />;
-        // case "credit_card":
-        //     return <CreateConsumerCreditCard onSubmit={onSubmit} renderActions={renderActions} />;
+        case "credit_card":
+            return <CreateConsumerCreditCard
+                onSubmit={onSubmit}
+                onFormFieldsChanged={onFormFieldsChanged}
+                renderActions={renderActions}
+                currentSecret={{
+                    type: "credit_card",
+
+                    name: currentSecret?.name ?? "",
+                    notes: currentSecret?.secretComment ?? "",
+
+                    ...(currentSecret?.secretValue as CreditCardContent ?? {}),
+                }}
+            />;
         // case "secure_note":
         //     return <CreateConsumerSecureNote onSubmit={onSubmit} renderActions={renderActions} />;
         default:

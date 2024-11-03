@@ -2,16 +2,13 @@ import {useState} from "react";
 import Head from "next/head";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import * as yup from "yup";
 
 // eslint-disable-next-line import/no-cycle
 import ConsumerSecretDynamicForm from "@app/components/consumer-secrets/ConsumerSecretDynamicForm";
-import {
-    consumerSecretWebsiteLogin,
-} from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
 import {OrgConsumerSecretList} from "@app/components/consumer-secrets/OrgConsumerSecretList";
 import {createNotification} from "@app/components/notifications";
 import {OrgPermissionCan} from "@app/components/permissions";
+import {consumerSecretTypes, TCreateConsumerSecretFormData} from "@app/components/utilities/consumer-secrets/types";
 import {Button, Modal, ModalContent, Select, SelectItem} from "@app/components/v2";
 import {OrgPermissionActions, OrgPermissionSubjects, useOrganization} from "@app/context";
 import {withPermission} from "@app/hoc";
@@ -19,50 +16,6 @@ import {usePopUp} from "@app/hooks";
 import {useCreateOrganizationConsumerSecret, useOrganizationConsumerSecrets} from "@app/hooks/api/consumer-secrets";
 import SettingsOrg from "@app/pages/org/[id]/settings";
 
-const consumerSecretTypes = [
-    {
-        name: "Website Login",
-        type: "website_login"
-    },
-    {
-        name: "Credit Card",
-        type: "credit_card"
-    },
-    {
-        name: "Secure Note",
-        type: "secure_note"
-    }
-];
-
-// dynamically adapts to the type of consumer secret being created
-export const consumerSecretFormSchema = yup.object({
-    type: yup
-        .string()
-        .oneOf(
-            consumerSecretTypes
-                .map((consumerSecretType) =>
-                    consumerSecretType.type
-                )
-        )
-        .required()
-        .label("Consumer Secret Type")
-}).shape({
-    data: yup.lazy((value) => {
-        switch (value.type) {
-            case "website_login":
-                return consumerSecretWebsiteLogin;
-            // TODO: implement those as well
-            // case "credit_card":
-            //     return creditCardSchema;
-            // case "secure_note":
-            //     return secureNoteSchema;
-            default:
-                return yup.mixed().notRequired();
-        }
-    })
-});
-
-export type TCreateConsumerSecretFormData = yup.InferType<typeof consumerSecretFormSchema>;
 
 const UserSecrets = withPermission(() => {
 

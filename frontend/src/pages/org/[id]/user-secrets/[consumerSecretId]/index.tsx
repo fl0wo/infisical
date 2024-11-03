@@ -113,7 +113,7 @@ const ConsumerSecretInspectPage = withPermission(() => {
         return <div>
             <Head>
                 <title>
-                    Consumer Secret
+                    User Secrets
                 </title>
                 <link rel="icon" href="/infisical.ico"/>
                 <meta property="og:image" content="/images/message.png"/>
@@ -132,12 +132,11 @@ const ConsumerSecretInspectPage = withPermission(() => {
                         >
                             <FontAwesomeIcon icon={faBackward} />
                         </IconButton>
-                        Consumer Secret
+                        User Secrets
                     </div>
                     <div className="mb-6 text-lg text-mineshaft-300">
-                        Inspect, edit and delete consumer secrets.
+                        Inspect, edit and delete user secrets.
                     </div>
-
 
                     {/* list all current consumer secrets */}
                     <div className="mt-6">

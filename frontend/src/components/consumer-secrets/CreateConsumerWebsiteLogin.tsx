@@ -1,32 +1,11 @@
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import * as yup from "yup";
 
+import {
+    consumerSecretWebsiteLogin,
+    TCreateConsumerSecretWebsiteLoginFormData
+} from "@app/components/utilities/consumer-secrets/types";
 import {FormControl, Input, TextArea} from "@app/components/v2";
-
-// Define WebsiteLogin schema
-export const consumerSecretWebsiteLogin = yup.object({
-    type: yup
-        .string()
-        .default("website_login"),
-
-    // SMELL: those are shared with the other consumer secret types as well (credit card, secure note)
-    name: yup
-        .string()
-        .required()
-        .max(64, "Too long, maximum length is 64 characters"),
-
-    notes: yup
-        .string()
-        .max(256, "Too long, maximum length is 256 characters"),
-
-    // website login related fields only
-    url: yup.string().url().required("URL is required for website login"),
-    username: yup.string().required("Username is required for website login"),
-    password: yup.string().required("Password is required for website login")
-});
-
-export type TCreateConsumerSecretWebsiteLoginFormData = yup.InferType<typeof consumerSecretWebsiteLogin>;
 
 export const CreateConsumerWebsiteLogin = ({
                                                onSubmit,
