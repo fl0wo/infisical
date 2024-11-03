@@ -1,12 +1,23 @@
 import Head from "next/head";
+import {useRouter} from "next/router";
+import {faBackward} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import {OrgPermissionActions, OrgPermissionSubjects, useOrganization} from "@app/context";
+import {IconButton} from "@app/components/v2";
+import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
-import SettingsOrg from "@app/pages/org/[id]/settings";
+import {useOrganizationConsumerSecret} from "@app/hooks/api/consumer-secrets/queries";
 
 const ConsumerSecretInspectPage = withPermission(() => {
 
-        const {currentOrg} = useOrganization();
+        const router = useRouter();
+
+        const consumerSecretId = router.query.consumerSecretId as string;
+
+        const {
+            data,
+            isLoading
+        } = useOrganizationConsumerSecret(consumerSecretId);
 
         return <div>
             <Head>
@@ -18,18 +29,47 @@ const ConsumerSecretInspectPage = withPermission(() => {
             </Head>
             <div className="flex h-full w-full justify-center bg-bunker-800 text-white">
                 <div className="w-full max-w-7xl px-6">
-                    <div className="mt-6 text-3xl font-semibold text-gray-200">
+                    <div className="mt-6 text-3xl font-semibold text-gray-200 flex flex-row gap-2">
+                        <IconButton
+                            variant="outline_bg"
+                            onClick={() => {
+                                const url = router.asPath.split("/").slice(0, -1).join("/");
+                                router.push(url);
+                            }}
+                            ariaLabel="Back"
+                            size="xs"
+                        >
+                            <FontAwesomeIcon icon={faBackward} />
+                        </IconButton>
                         Consumer Secret
                     </div>
                     <div className="mb-6 text-lg text-mineshaft-300">
-                        Inspecting secret
+                        Inspect, edit and delete consumer secrets.
                     </div>
+
 
                     {/* list all current consumer secrets */}
                     <div className="mt-6">
                         <div className="mt-2">
-                            ciao ciao
-                            {JSON.stringify(currentOrg)}
+
+                            {/* <ConsumerSecretDynamicForm */}
+                            {/*    type={selectedConsumerSecretType} */}
+                            {/*    onSubmit={onCreateConsumerSecret} */}
+                            {/*    renderActions={renderFormsActions} */}
+                            {/* /> */}
+
+                            {
+                                isLoading && <div>Loading...</div>
+                            }
+
+                            {
+                                !isLoading && <div>
+                                    {
+                                        JSON.stringify(data)
+                                    }
+                                </div>
+                            }
+
                         </div>
                     </div>
 
@@ -39,14 +79,12 @@ const ConsumerSecretInspectPage = withPermission(() => {
     },
     // TODO: should apply the right permissions
     {
-        action: OrgPermissionActions.Delete,
-        subject: OrgPermissionSubjects.SecretScanning,
+        action: OrgPermissionActions.Read,
+        subject: OrgPermissionSubjects.Settings,
     })
 
 Object.assign(ConsumerSecretInspectPage, {
     requireAuth: true
 });
-
-SettingsOrg.requireAuth = true;
 
 export default ConsumerSecretInspectPage;

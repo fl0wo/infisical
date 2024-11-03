@@ -35,10 +35,24 @@ const createConsumerSecretRequest = z.object({
   secretValue: zodDynamicConsumerSecretValueType
 });
 
+const zodConsumerSecret = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+
+  secretValue: zodDynamicConsumerSecretValueType,
+  secretComment: z.string(), // It gets decrypted from service layer
+
+  type: z.string(),
+  userId: z.string().uuid().nullable().optional(),
+  organizationId: z.string().uuid().nullable().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional()
+});
+
 export const registerConsumerSecretRouter = async (server: FastifyZodProvider) => {
   server.route({
     method: "GET",
-    url: "/:organizationId",
+    url: "/list/:organizationId",
     config: {
       // todo: add a custom rate limit for this endpoint
       rateLimit: secretsLimit
@@ -55,21 +69,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       }),
       response: {
         200: z.object({
-          consumerSecrets: z
-            .object({
-              id: z.string().uuid(),
-              name: z.string(),
-
-              secretValue: zodDynamicConsumerSecretValueType,
-              secretComment: z.string(), // It gets decrypted from service layer
-
-              type: z.string(),
-              userId: z.string().uuid().nullable().optional(),
-              organizationId: z.string().uuid().nullable().optional(),
-              createdAt: z.date().optional(),
-              updatedAt: z.date().optional()
-            })
-            .array()
+          consumerSecrets: zodConsumerSecret.array()
         })
       }
     },
@@ -92,6 +92,54 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       return {
         consumerSecrets: consumerSecretsOfOrganization
       };
+    }
+  });
+
+  server.route({
+    method: "GET",
+    url: "/get/:consumerSecretId",
+    config: {
+      // todo: add a custom rate limit for this endpoint
+      rateLimit: secretsLimit
+    },
+    schema: {
+      description: "Get a consumer secret by it's id",
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      params: z.object({
+        consumerSecretId: z.string().trim().describe("Consumer Secret ID")
+      }),
+      response: {
+        200: z.object({
+          consumerSecret: zodConsumerSecret.optional()
+        })
+      }
+    },
+    onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
+    handler: async (req) => {
+      // TODO: probably can replace this with a permissionService dedicated
+      if (req.permission.type !== "user") {
+        throw new Error("You are not allowed to view this secret");
+      }
+
+      // TODO: 1. understand how to get the current userId (logged session)
+      // const userId = req.permission.id; // is this the user id?
+
+      // TODO: 2. understand how to get the organizationId
+      const paramConsumerSecretId = req.params.consumerSecretId; // maybe it's better to use this?
+      // const userId = req.permission.id;
+
+      // TODO: 3. understand how to check if the user belongs to the organization
+      // const { orgId } = req.permission;
+
+      const consumerSecret = await server.services.consumerSecret.getAndDecryptSecretById(paramConsumerSecretId);
+
+      console.log("Fetched sec", consumerSecret);
+
+      return { consumerSecret };
     }
   });
 
@@ -129,7 +177,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       const myOrgId = req.params.organizationId;
       const secretName = req.body.name;
 
-      // I can use .services.consumerSecret here cuz I injected it in the server (index.ts of routes)
+      // I can use .services.zodConsumerSecret here cuz I injected it in the server (index.ts of routes)
       const savedSecret = await server.services.consumerSecret.createSecret({
         organizationId: myOrgId,
         name: secretName,

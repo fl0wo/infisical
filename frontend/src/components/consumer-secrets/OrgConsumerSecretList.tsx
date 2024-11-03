@@ -37,8 +37,8 @@ export const OrgConsumerSecretList = ({
                                         console.log("No secret id found", secret);
                                         return;
                                     }
-                                  // route to this particular secret view page
-                                    router.push(`${router.pathname}/${secret.id}`);
+                                    const url = `${router.asPath}/${secret.id}`;
+                                    router.push(url)
                                 }}
                                 key={secret.id}
                                 className={
@@ -49,7 +49,7 @@ export const OrgConsumerSecretList = ({
                                         "duration-200",
                                         "border-b",
                                         "border-gray-200",
-                                        // less than 10sec ago? Show as new and highlight green
+                                        // todo: refactor, less than 10sec ago? Show as new and highlight green
                                         Date.now() - new Date(secret.createdAt ?? Date.now()).getTime() < 10 * 1000 && "bg-primary text-black",
                                     )
                                 }

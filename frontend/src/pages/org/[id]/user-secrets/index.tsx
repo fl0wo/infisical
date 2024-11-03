@@ -4,11 +4,10 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as yup from "yup";
 
-import CreateConsumerCreditCard from "@app/components/consumer-secrets/CreateConsumerCreditCard";
-import CreateConsumerSecureNote from "@app/components/consumer-secrets/CreateConsumerSecureNote";
+// eslint-disable-next-line import/no-cycle
+import ConsumerSecretDynamicForm from "@app/components/consumer-secrets/ConsumerSecretDynamicForm";
 import {
     consumerSecretWebsiteLogin,
-    CreateConsumerWebsiteLogin,
 } from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
 import {OrgConsumerSecretList} from "@app/components/consumer-secrets/OrgConsumerSecretList";
 import {createNotification} from "@app/components/notifications";
@@ -246,26 +245,11 @@ const UserSecrets = withPermission(() => {
                                 ))}
                             </Select>
 
-                            {
-                                selectedConsumerSecretType === "website_login" && (
-                                    <CreateConsumerWebsiteLogin
-                                        onSubmit={onCreateConsumerSecret}
-                                        renderActions={renderFormsActions}
-                                    />
-                                )
-                            }
-
-                            {
-                                selectedConsumerSecretType === "credit_card" && (
-                                    <CreateConsumerCreditCard/>
-                                )
-                            }
-
-                            {
-                                selectedConsumerSecretType === "secure_note" && (
-                                    <CreateConsumerSecureNote/>
-                                )
-                            }
+                            <ConsumerSecretDynamicForm
+                                type={selectedConsumerSecretType}
+                                onSubmit={onCreateConsumerSecret}
+                                renderActions={renderFormsActions}
+                            />
 
                             {/* add more consumer type forms */}
 
