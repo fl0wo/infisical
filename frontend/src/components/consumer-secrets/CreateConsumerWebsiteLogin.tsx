@@ -30,10 +30,12 @@ export type TCreateConsumerSecretWebsiteLoginFormData = yup.InferType<typeof con
 
 export const CreateConsumerWebsiteLogin = ({
                                                onSubmit,
+                                               onFormFieldsChanged,
                                                renderActions,
                                                currentSecret
 }: {
     onSubmit: (data: TCreateConsumerSecretWebsiteLoginFormData) => void;
+    onFormFieldsChanged?: () => void;
     renderActions: (
         isSubmitting: boolean,
         resetFormFields: () => void
@@ -66,7 +68,7 @@ export const CreateConsumerWebsiteLogin = ({
                         isError={Boolean(error)}
                         errorText={error?.message}
                     >
-                        <Input {...field} placeholder="Type your consumer secret name"/>
+                        <Input {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your consumer secret name"/>
                     </FormControl>
                 )}
             />
@@ -81,7 +83,7 @@ export const CreateConsumerWebsiteLogin = ({
                         isError={Boolean(error)}
                         errorText={error?.message}
                     >
-                        <Input type="url" {...field} placeholder="Type your URL"/>
+                        <Input type="url" {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your URL"/>
                     </FormControl>
                 )}
             />
@@ -96,7 +98,7 @@ export const CreateConsumerWebsiteLogin = ({
                         isError={Boolean(error)}
                         errorText={error?.message}
                     >
-                        <Input {...field} placeholder="Type your username"/>
+                        <Input {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your username"/>
                     </FormControl>
                 )}
             />
@@ -111,7 +113,7 @@ export const CreateConsumerWebsiteLogin = ({
                         isError={Boolean(error)}
                         errorText={error?.message}
                     >
-                        <Input type="password" {...field} placeholder="Type your password"/>
+                        <Input type={currentSecret?.password ? "text" : "password"} {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your password"/>
                     </FormControl>
                 )}
 
@@ -127,7 +129,7 @@ export const CreateConsumerWebsiteLogin = ({
                         isError={Boolean(error)}
                         errorText={error?.message}
                     >
-                        <TextArea {...field} placeholder="Type your notes"/>
+                        <TextArea {...field} onChangeCapture={onFormFieldsChanged} placeholder="Type your notes"/>
                     </FormControl>
                 )}
 

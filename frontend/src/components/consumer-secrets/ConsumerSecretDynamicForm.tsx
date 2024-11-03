@@ -5,11 +5,13 @@ import {TCreateConsumerSecretFormData} from "@app/pages/org/[id]/user-secrets";
 export default function ConsumerSecretDynamicForm({
                                                       type,
                                                       onSubmit,
+                                                      onFormFieldsChanged,
                                                       renderActions,
                                                       currentSecret
 }: {
     type?: TCreateConsumerSecretFormData["type"]
     onSubmit: (data: TCreateConsumerSecretFormData["data"]) => void;
+    onFormFieldsChanged?: () => void;
     renderActions: (isSubmitting: boolean, resetFormFields: () => void) => React.ReactNode;
     currentSecret?: TConsumerSecretFetched
 }) {
@@ -17,6 +19,7 @@ export default function ConsumerSecretDynamicForm({
         case "website_login":
             return <CreateConsumerWebsiteLogin
                 onSubmit={onSubmit}
+                onFormFieldsChanged={onFormFieldsChanged}
                 renderActions={renderActions}
                 currentSecret={{
                     type: "website_login",
