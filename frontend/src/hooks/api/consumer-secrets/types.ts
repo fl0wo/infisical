@@ -1,13 +1,3 @@
-// TODO: rectify/standardize types
-
-export type TCreateConsumerSecretRequest = {
-    id: string,
-    organizationId: string,
-    name: string,
-    note?: string,
-    content: TConsumerSecret
-}
-
 export type TConsumerSecret = {
   type: "website_login" | "credit_card" | "secure_note",
   name: string,

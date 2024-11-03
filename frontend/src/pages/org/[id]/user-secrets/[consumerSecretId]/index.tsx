@@ -32,7 +32,7 @@ const ConsumerSecretInspectPage = withPermission(() => {
         const [formFieldsChanged, setFormFieldsChanged] = useState(false);
 
         const onUpdateConsumerSecret = async (
-            data: TCreateConsumerSecretFormData["data"]
+            data: Partial<TCreateConsumerSecretFormData["data"]>
         ) => {
             try {
 
@@ -40,8 +40,9 @@ const ConsumerSecretInspectPage = withPermission(() => {
                     throw new Error("Consumer Secret ID not found");
                 }
 
-                console.log("data to push", data);
+                console.log("data to edit", data);
 
+                // TODO: not good, we're pushing the whole object every time instead of just the fields that actually changed find a way to do for the delta-diff of fields only
                 await updateConsumerSecretMutation.mutateAsync({
                     consumerSecretId,
                     name: data.name,

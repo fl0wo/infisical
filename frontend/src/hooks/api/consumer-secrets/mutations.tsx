@@ -40,18 +40,18 @@ export const useUpdateOrganizationConsumerSecret = () => {
     return useMutation({
         mutationFn: async (body: {
             consumerSecretId: string,
-            name: string,
-            secretComment: string,
+            name?: string,
+            secretComment?: string,
 
             type: TConsumerSecret["type"],
-            secretValue: TConsumerSecret["secret"]
+            secretValue: Partial<TConsumerSecret["secret"]>
         }) => {
 
             const {consumerSecretId} = body;
 
             const payload = {
                 ...body,
-                organizationId: undefined,
+                consumerSecretId: undefined,
             }
 
             const {data} = await apiRequest.patch(`/api/v3/consumer-secrets/${consumerSecretId}`, payload);
