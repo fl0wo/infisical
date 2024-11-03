@@ -92,11 +92,7 @@ const UserSecrets = withPermission(() => {
                     throw new Error("Organization ID not found");
                 }
 
-                console.log("data to push", data);
-
-                // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
                 await mutate.mutateAsync({
-                    // fixme: understand how to get the CURRENT organizationId
                     organizationId: currentOrgId,
                     name: data.name,
                     secretComment: data.notes,
@@ -104,10 +100,10 @@ const UserSecrets = withPermission(() => {
                     secretValue: data
                 });
 
-                createNotification({text: "Secret created!", type: "success"});
+                createNotification({text: "User secret created!", type: "success"});
                 handlePopUpClose("addNewConsumerSecret");
             } catch (err) {
-                createNotification({text: "Failed to create project", type: "error"});
+                createNotification({text: "Failed to create user secret", type: "error"});
             }
         };
 

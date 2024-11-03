@@ -31,7 +31,7 @@ export const useCreateOrganizationConsumerSecret = () => {
             // wait 2sec
             setTimeout(() => {
                 queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
-            }, 2000);
+            }, 1000);
         }
     });
 };
@@ -61,7 +61,7 @@ export const useUpdateOrganizationConsumerSecret = () => {
             // wait 2sec
             setTimeout(() => {
                 queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(consumerSecretId));
-            }, 2000);
+            }, 1000);
         }
     });
 };
@@ -70,17 +70,20 @@ export const useDeleteOrganizationConsumerSecret = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({
-                               id
-                           }: {
-            organizationId: string;
-            id: string;
-        }) => {
+        mutationFn: async ({id}: { id: string; }) => {
+
+            if(!id) {
+                throw new Error("Consumer Secret ID not found");
+            }
+
             const {data} = await apiRequest.delete(`/api/v3/consumer-secrets/${id}`);
             return data;
         },
-        onSuccess: (_, {organizationId}) => {
-            queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(organizationId));
+        onSuccess: (_, {id}) => {
+            // wait 2sec
+            setTimeout(() => {
+                queryClient.invalidateQueries(consumerSecretKeys.forOrganizationConsumerSecrets(id));
+            }, 1000);
         }
     });
 };

@@ -10,6 +10,7 @@ import {Button, IconButton} from "@app/components/v2";
 import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
 import {
+    useDeleteOrganizationConsumerSecret,
     useUpdateOrganizationConsumerSecret
 } from "@app/hooks/api/consumer-secrets";
 import {useOrganizationConsumerSecret} from "@app/hooks/api/consumer-secrets/queries";
@@ -25,7 +26,8 @@ const ConsumerSecretInspectPage = withPermission(() => {
             isLoading
         } = useOrganizationConsumerSecret(consumerSecretId);
 
-        const mutate = useUpdateOrganizationConsumerSecret();
+        const updateConsumerSecretMutation = useUpdateOrganizationConsumerSecret();
+        const deleteConsumerSecretMutation = useDeleteOrganizationConsumerSecret();
 
         const [formFieldsChanged, setFormFieldsChanged] = useState(false);
 
@@ -40,7 +42,7 @@ const ConsumerSecretInspectPage = withPermission(() => {
 
                 console.log("data to push", data);
 
-                await mutate.mutateAsync({
+                await updateConsumerSecretMutation.mutateAsync({
                     consumerSecretId,
                     name: data.name,
                     secretComment: data.notes,
@@ -48,49 +50,59 @@ const ConsumerSecretInspectPage = withPermission(() => {
                     secretValue: data
                 });
 
-                createNotification({text: "Secret created!", type: "success"});
+                createNotification({text: "Secret updated!", type: "success"});
             } catch (err) {
-                createNotification({text: "Failed to create project", type: "error"});
+                createNotification({text: "Failed to update secret", type: "error"});
             }
         };
 
         const renderFormsActions = (
             isSubmitting: boolean,
             resetFormFields: () => void
-        ) => {
-
-            if (!formFieldsChanged) {
-                return null;
-            }
-
-            return (
-                <div className="mt-14 flex">
-                    <div className="absolute right-0 bottom-0 mr-6 mb-6 flex items-start justify-end">
+        ) =>
+            <div className="mt-14 flex">
+                <div className="absolute right-0 bottom-0 mr-6 mb-6 flex items-start justify-end">
+                    {
+                        !formFieldsChanged &&
                         <Button
-                            key="layout-cancel-create-consumer-secret"
+                            key="layout-delete-consumer-secret"
                             onClick={() => {
-                                resetFormFields();
-                                setFormFieldsChanged(false);
+                                deleteConsumerSecretMutation.mutateAsync({id:consumerSecretId});
                             }}
-                            colorSchema="secondary"
-                            variant="plain"
-                            className="py-2"
+                            colorSchema="danger"
+                            variant="outline_bg"
+                            className="py-2 w-36"
                         >
-                            Discard Changes
+                            Delete{isSubmitting ? "ing" : ""} {consumerSecretFetched?.name}
                         </Button>
-                        <Button
-                            isDisabled={isSubmitting}
-                            isLoading={isSubmitting}
-                            key="layout-create-consumer-secret-submit"
-                            className="ml-4"
-                            type="submit"
-                        >
-                            Edit{isSubmitting ? "ing" : ""} {consumerSecretFetched?.name}
-                        </Button>
-                    </div>
+                    }
+                    {
+                        formFieldsChanged && <>
+                            <Button
+                                key="layout-cancel-update-consumer-secret"
+                                onClick={() => {
+                                    resetFormFields();
+                                    setFormFieldsChanged(false);
+                                }}
+                                colorSchema="secondary"
+                                variant="plain"
+                                className="py-2"
+                            >
+                                Discard Changes
+                            </Button>
+                            <Button
+                                isDisabled={isSubmitting}
+                                isLoading={isSubmitting}
+                                key="layout-update-consumer-secret-submit"
+                                className="ml-4"
+                                type="submit"
+                            >
+                                Edit{isSubmitting ? "ing" : ""} {consumerSecretFetched?.name}
+                            </Button>
+                        </>
+                    }
                 </div>
-            );
-        }
+            </div>
 
         return <div>
             <Head>
