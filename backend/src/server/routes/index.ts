@@ -99,6 +99,8 @@ import { certificateTemplateDALFactory } from "@app/services/certificate-templat
 import { certificateTemplateEstConfigDALFactory } from "@app/services/certificate-template/certificate-template-est-config-dal";
 import { certificateTemplateServiceFactory } from "@app/services/certificate-template/certificate-template-service";
 import { cmekServiceFactory } from "@app/services/cmek/cmek-service";
+import { consumerSecretDALFactory } from "@app/services/consumer-secret/secret-dal";
+import { consumerSecretServiceFactory } from "@app/services/consumer-secret/secret-service";
 import { externalGroupOrgRoleMappingDALFactory } from "@app/services/external-group-org-role-mapping/external-group-org-role-mapping-dal";
 import { externalGroupOrgRoleMappingServiceFactory } from "@app/services/external-group-org-role-mapping/external-group-org-role-mapping-service";
 import { externalMigrationQueueFactory } from "@app/services/external-migration/external-migration-queue";
@@ -253,6 +255,9 @@ export const registerRoutes = async (
   const projectBotDAL = projectBotDALFactory(db);
 
   const secretDAL = secretDALFactory(db);
+
+  const consumerSecretDAL = consumerSecretDALFactory(db);
+
   const secretTagDAL = secretTagDALFactory(db);
   const folderDAL = secretFolderDALFactory(db);
   const folderVersionDAL = secretFolderVersionDALFactory(db);
@@ -783,6 +788,7 @@ export const registerRoutes = async (
     licenseService,
     folderDAL,
     secretDAL,
+    // TODO: would be interesting to snapshot the consumerSecrets as well
     snapshotDAL,
     snapshotFolderDAL,
     snapshotSecretDAL,
@@ -1256,6 +1262,11 @@ export const registerRoutes = async (
     externalGroupOrgRoleMappingDAL
   });
 
+  const consumerSecretsService = consumerSecretServiceFactory({
+    consumerSecretDAL
+    // permissionService
+  });
+
   await superAdminService.initServerCfg();
   //
   // setup the communication with license key server
@@ -1343,7 +1354,8 @@ export const registerRoutes = async (
     slack: slackService,
     workflowIntegration: workflowIntegrationService,
     migration: migrationService,
-    externalGroupOrgRoleMapping: externalGroupOrgRoleMappingService
+    externalGroupOrgRoleMapping: externalGroupOrgRoleMappingService,
+    consumerSecret: consumerSecretsService
   });
 
   const cronJobs: CronJob[] = [];

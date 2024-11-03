@@ -4,22 +4,27 @@ import {apiRequest} from "@app/config/request";
 import {consumerSecretKeys} from "@app/hooks/api/consumer-secrets/queries";
 import {TConsumerSecret, TCreateConsumerSecretRequest} from "@app/hooks/api/consumer-secrets/types";
 
-
 export const useCreateOrganizationConsumerSecret = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({organizationId, name, note, content}: {
-            organizationId: string;
-            name: string;
-            note?: string;
-            content: TConsumerSecret;
+        mutationFn: async (body: {
+            organizationId: string,
+            name: string,
+            secretComment: string,
+
+            type: TConsumerSecret["type"],
+            secretValue: TConsumerSecret["secret"]
         }) => {
-            const {data} = await apiRequest.post(`/api/v1/organization/${organizationId}/consumer-secrets`, {
-                name,
-                note,
-                content
-            });
+
+            const {organizationId} = body;
+
+            const payload = {
+                ...body,
+                organizationId: undefined,
+            }
+
+            const {data} = await apiRequest.post(`/api/v3/consumer-secrets/${organizationId}`, payload);
             return data;
         },
         onSuccess: (_, {organizationId}) => {
@@ -37,7 +42,7 @@ export const useUpdateOrganizationConsumerSecret = () => {
                                note,
                                content
                            }: TCreateConsumerSecretRequest) => {
-            const {data} = await apiRequest.patch(`/api/v1/organization/${organizationId}/consumer-secrets/${id}`, {
+            const {data} = await apiRequest.patch(`/api/v3/consumer-secrets/${organizationId}/${id}`, {
                 name,
                 note,
                 content
@@ -61,7 +66,7 @@ export const useDeleteOrganizationConsumerSecret = () => {
             organizationId: string;
             id: string;
         }) => {
-            const {data} = await apiRequest.delete(`/api/v1/organization/${organizationId}/consumer-secrets/${id}`);
+            const {data} = await apiRequest.delete(`/api/v3/consumer-secrets/${organizationId}/${id}`);
             return data;
         },
         onSuccess: (_, {organizationId}) => {

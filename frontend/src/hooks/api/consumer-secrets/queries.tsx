@@ -10,8 +10,9 @@ export const useOrganizationConsumerSecrets = (organizationId: string) => {
   return useQuery({
     queryKey: consumerSecretKeys.forOrganizationConsumerSecrets(organizationId),
     queryFn: async () => {
-      const { data } = await apiRequest.get(`/api/v1/organization/${organizationId}/consumer-secrets`);
+      const { data } = await apiRequest.get(`/api/v3/consumer-secrets/${organizationId}`);
       return data;
-    }
+    },
+    staleTime: 0,
   });
 };

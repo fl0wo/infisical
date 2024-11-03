@@ -12,15 +12,11 @@ import {
 } from "@app/components/consumer-secrets/CreateConsumerWebsiteLogin";
 import {createNotification} from "@app/components/notifications";
 import {OrgPermissionCan} from "@app/components/permissions";
-import {
-    Button,
-    Modal,
-    ModalContent, Select, SelectItem
-} from "@app/components/v2";
+import {Button, Modal, ModalContent, Select, SelectItem} from "@app/components/v2";
 import {OrgPermissionActions, OrgPermissionSubjects} from "@app/context";
 import {withPermission} from "@app/hoc";
 import {usePopUp} from "@app/hooks";
-import {useCreateOrganizationConsumerSecret} from "@app/hooks/api/consumer-secrets";
+import {useCreateOrganizationConsumerSecret, useOrganizationConsumerSecrets} from "@app/hooks/api/consumer-secrets";
 
 const consumerSecretTypes = [
     {
@@ -73,6 +69,10 @@ const UserSecrets = withPermission(() => {
             "addNewConsumerSecret"
         ] as const);
 
+        const res = useOrganizationConsumerSecrets("organizationId");
+
+        console.log("Replied data",res?.data);
+
         const mutate = useCreateOrganizationConsumerSecret();
 
         const [selectedConsumerSecretType, setSelectedConsumerSecretType] = useState<TCreateConsumerSecretFormData["type"] | undefined>();
@@ -105,11 +105,10 @@ const UserSecrets = withPermission(() => {
                 // Overall, for low number of N secrets, I feel inserting contents as JSON is an "ok-ish" approach, surely the fastest to implement.
                 await mutate.mutateAsync({
                     organizationId: "organizationId",
-                    name: "name",
-                    note: "",
-
-                    // FIXME: type of data should be smth like {type} & WebsiteLogin | CreditCard | SecureNote but seems yup.InferType is not working on my IDE maybe on VSCode it shows the correct type
-                    content: data,
+                    name: "my-consumer-secret",
+                    secretComment: "This is a fixed note",
+                    type: data.type,
+                    secretValue: data
                 });
 
                 console.log("Created secret!", data);

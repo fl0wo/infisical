@@ -41,6 +41,7 @@ export enum TableName {
   ProjectUserAdditionalPrivilege = "project_user_additional_privilege",
   ProjectUserMembershipRole = "project_user_membership_roles",
   ProjectKeys = "project_keys",
+  ConsumerSecret = "consumer_secrets",
   Secret = "secrets",
   SecretReference = "secret_references",
   SecretSharing = "secret_sharing",
@@ -173,6 +174,12 @@ export enum SecretKeyEncoding {
 export enum SecretType {
   Shared = "shared",
   Personal = "personal"
+}
+
+export enum ConsumerSecretType {
+  WebsiteLogin = "website_login",
+  CreditCard = "credit_card",
+  SecureNote = "secure_note"
 }
 
 export enum ProjectVersion {

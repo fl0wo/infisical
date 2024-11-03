@@ -102,6 +102,16 @@ export const secretRawSchema = z.object({
   updatedAt: z.date()
 });
 
+export const consumerSecretRawSchema = z.object({
+  id: z.string(),
+  _id: z.string(),
+  type: z.string(),
+  secretValue: z.string(),
+  secretComment: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date()
+});
+
 export const ProjectPermissionSchema = z.object({
   action: z
     .nativeEnum(ProjectPermissionActions)
