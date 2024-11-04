@@ -186,7 +186,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
         organizationId: paramOrgId,
         name: secretName,
         type: req.body.type,
-        userId: "6e74f399-b138-4f4e-94ab-bd0827b1e4fe",
+        userId: req.permission.id,
         secretValue: req.body.secretValue,
         secretComment: req.body.secretComment
       });
