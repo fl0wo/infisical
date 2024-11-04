@@ -215,7 +215,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
         type: true
       }),
       response: {
-        200: z.boolean()
+        200: z.boolean().describe("True if the secret is updated successfully")
       }
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
