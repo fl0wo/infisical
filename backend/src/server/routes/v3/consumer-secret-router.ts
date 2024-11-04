@@ -163,8 +163,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
       }),
       body: createConsumerSecretRequest,
       response: {
-        // todo: add a type here plz
-        200: z.any()
+        200: z.boolean().describe("True if the secret is created successfully")
       }
     },
     onRequest: verifyAuth([AuthMode.JWT, AuthMode.API_KEY, AuthMode.SERVICE_TOKEN, AuthMode.IDENTITY_ACCESS_TOKEN]),
@@ -192,9 +191,7 @@ export const registerConsumerSecretRouter = async (server: FastifyZodProvider) =
         secretComment: req.body.secretComment
       });
 
-      return {
-        secret: savedSecret
-      };
+      return !!savedSecret;
     }
   });
 
